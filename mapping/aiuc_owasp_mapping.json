@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "generated_at": "2026-03-03T20:19:24.693848",
+    "generated_at": "2026-03-03T21:09:25.966097",
     "methodology": "multi-signal-hybrid",
     "version": "1.0",
     "weights": {
@@ -41,19 +41,19 @@
             "signals": {
               "reference_bridge": 0.333,
               "semantic": 0.639,
-              "keyword": 0.065
+              "keyword": 0.064
             },
             "relationship_type": "Prevents"
           },
           {
             "owasp_id": "ASI09",
             "owasp_title": "Human-Agent TrustExploitation",
-            "score": 0.362,
+            "score": 0.363,
             "confidence": "Related",
             "signals": {
               "reference_bridge": 0.167,
               "semantic": 0.782,
-              "keyword": 0.068
+              "keyword": 0.07
             },
             "relationship_type": "Prevents"
           }
@@ -189,7 +189,7 @@
             "signals": {
               "reference_bridge": 0.25,
               "semantic": 0.844,
-              "keyword": 0.122
+              "keyword": 0.121
             },
             "relationship_type": "Detects"
           }
@@ -246,19 +246,19 @@
             "signals": {
               "reference_bridge": 0.25,
               "semantic": 0.849,
-              "keyword": 0.107
+              "keyword": 0.106
             },
             "relationship_type": "Detects"
           },
           {
             "owasp_id": "ASI01",
             "owasp_title": "Agent Goal Hijack",
-            "score": 0.419,
+            "score": 0.42,
             "confidence": "Related",
             "signals": {
               "reference_bridge": 0.333,
               "semantic": 0.707,
-              "keyword": 0.11
+              "keyword": 0.112
             },
             "relationship_type": "Detects"
           },
@@ -282,7 +282,7 @@
             "signals": {
               "reference_bridge": 0.5,
               "semantic": 0.38,
-              "keyword": 0.055
+              "keyword": 0.057
             },
             "relationship_type": "Detects"
           }
@@ -319,31 +319,31 @@
             "signals": {
               "reference_bridge": 0.4,
               "semantic": 0.631,
-              "keyword": 0.059
+              "keyword": 0.06
             },
             "relationship_type": "Prevents"
           },
           {
             "owasp_id": "ASI02",
             "owasp_title": "Tool Misuse and Exploitation",
-            "score": 0.398,
+            "score": 0.399,
             "confidence": "Related",
             "signals": {
               "reference_bridge": 0.333,
               "semantic": 0.667,
-              "keyword": 0.075
+              "keyword": 0.076
             },
             "relationship_type": "Prevents"
           },
           {
             "owasp_id": "ASI09",
             "owasp_title": "Human-Agent TrustExploitation",
-            "score": 0.361,
+            "score": 0.362,
             "confidence": "Related",
             "signals": {
               "reference_bridge": 0.167,
               "semantic": 0.771,
-              "keyword": 0.082
+              "keyword": 0.086
             },
             "relationship_type": "Prevents"
           }
@@ -411,7 +411,7 @@
             "signals": {
               "reference_bridge": 0.5,
               "semantic": 0.888,
-              "keyword": 0.114
+              "keyword": 0.113
             },
             "relationship_type": "Prevents"
           }
@@ -449,7 +449,7 @@
             "signals": {
               "reference_bridge": 0.25,
               "semantic": 0.791,
-              "keyword": 0.039
+              "keyword": 0.038
             },
             "relationship_type": "Prevents"
           },
@@ -461,7 +461,7 @@
             "signals": {
               "reference_bridge": 0.5,
               "semantic": 0.398,
-              "keyword": 0.034
+              "keyword": 0.033
             },
             "relationship_type": "Prevents"
           }
@@ -535,7 +535,7 @@
             "signals": {
               "reference_bridge": 0.5,
               "semantic": 0.759,
-              "keyword": 0.049
+              "keyword": 0.05
             },
             "relationship_type": "Prevents"
           }
@@ -585,7 +585,7 @@
             "signals": {
               "reference_bridge": 0.333,
               "semantic": 0.909,
-              "keyword": 0.144
+              "keyword": 0.145
             },
             "relationship_type": "Prevents"
           }
@@ -604,7 +604,7 @@
             "signals": {
               "reference_bridge": 1.0,
               "semantic": 0.879,
-              "keyword": 0.106
+              "keyword": 0.105
             },
             "relationship_type": "Prevents"
           }
@@ -666,7 +666,7 @@
             "signals": {
               "reference_bridge": 1.0,
               "semantic": 0.837,
-              "keyword": 0.048
+              "keyword": 0.043
             },
             "relationship_type": "Prevents"
           }
@@ -692,12 +692,12 @@
           {
             "owasp_id": "ASI09",
             "owasp_title": "Human-Agent TrustExploitation",
-            "score": 0.385,
+            "score": 0.386,
             "confidence": "Related",
             "signals": {
               "reference_bridge": 0.333,
               "semantic": 0.649,
-              "keyword": 0.04
+              "keyword": 0.042
             },
             "relationship_type": "Prevents"
           },
@@ -709,7 +709,7 @@
             "signals": {
               "reference_bridge": 0.25,
               "semantic": 0.662,
-              "keyword": 0.069
+              "keyword": 0.071
             },
             "relationship_type": "Prevents"
           }
@@ -799,12 +799,12 @@
             "aiuc_id": "B005",
             "aiuc_title": "Implement real-time input filtering",
             "aiuc_domain": "Security",
-            "score": 0.419,
+            "score": 0.42,
             "confidence": "Related",
             "signals": {
               "reference_bridge": 0.333,
               "semantic": 0.707,
-              "keyword": 0.11
+              "keyword": 0.112
             },
             "relationship_type": "Detects"
           },
@@ -837,7 +837,7 @@
             "signals": {
               "reference_bridge": 1.0,
               "semantic": 0.879,
-              "keyword": 0.106
+              "keyword": 0.105
             },
             "relationship_type": "Prevents"
           },
@@ -850,7 +850,7 @@
             "signals": {
               "reference_bridge": 0.333,
               "semantic": 0.909,
-              "keyword": 0.144
+              "keyword": 0.145
             },
             "relationship_type": "Prevents"
           },
@@ -858,12 +858,12 @@
             "aiuc_id": "B007",
             "aiuc_title": "Enforce user access privileges to AI systems",
             "aiuc_domain": "Security",
-            "score": 0.398,
+            "score": 0.399,
             "confidence": "Related",
             "signals": {
               "reference_bridge": 0.333,
               "semantic": 0.667,
-              "keyword": 0.075
+              "keyword": 0.076
             },
             "relationship_type": "Prevents"
           },
@@ -876,7 +876,7 @@
             "signals": {
               "reference_bridge": 0.333,
               "semantic": 0.639,
-              "keyword": 0.065
+              "keyword": 0.064
             },
             "relationship_type": "Prevents"
           }
@@ -916,7 +916,7 @@
             "signals": {
               "reference_bridge": 1.0,
               "semantic": 0.837,
-              "keyword": 0.048
+              "keyword": 0.043
             },
             "relationship_type": "Prevents"
           },
@@ -968,7 +968,7 @@
             "signals": {
               "reference_bridge": 0.25,
               "semantic": 0.662,
-              "keyword": 0.069
+              "keyword": 0.071
             },
             "relationship_type": "Prevents"
           }
@@ -1027,7 +1027,7 @@
             "signals": {
               "reference_bridge": 0.25,
               "semantic": 0.844,
-              "keyword": 0.122
+              "keyword": 0.121
             },
             "relationship_type": "Detects"
           },
@@ -1040,7 +1040,7 @@
             "signals": {
               "reference_bridge": 0.25,
               "semantic": 0.849,
-              "keyword": 0.107
+              "keyword": 0.106
             },
             "relationship_type": "Detects"
           },
@@ -1066,7 +1066,7 @@
             "signals": {
               "reference_bridge": 0.5,
               "semantic": 0.398,
-              "keyword": 0.034
+              "keyword": 0.033
             },
             "relationship_type": "Prevents"
           }
@@ -1138,7 +1138,7 @@
             "signals": {
               "reference_bridge": 0.5,
               "semantic": 0.38,
-              "keyword": 0.055
+              "keyword": 0.057
             },
             "relationship_type": "Detects"
           }
@@ -1158,7 +1158,7 @@
             "signals": {
               "reference_bridge": 0.5,
               "semantic": 0.888,
-              "keyword": 0.114
+              "keyword": 0.113
             },
             "relationship_type": "Prevents"
           },
@@ -1171,7 +1171,7 @@
             "signals": {
               "reference_bridge": 0.5,
               "semantic": 0.759,
-              "keyword": 0.049
+              "keyword": 0.05
             },
             "relationship_type": "Prevents"
           },
@@ -1197,7 +1197,7 @@
             "signals": {
               "reference_bridge": 0.25,
               "semantic": 0.791,
-              "keyword": 0.039
+              "keyword": 0.038
             },
             "relationship_type": "Prevents"
           },
@@ -1205,12 +1205,12 @@
             "aiuc_id": "E009",
             "aiuc_title": "Monitor third-party access",
             "aiuc_domain": "Accountability",
-            "score": 0.385,
+            "score": 0.386,
             "confidence": "Related",
             "signals": {
               "reference_bridge": 0.333,
               "semantic": 0.649,
-              "keyword": 0.04
+              "keyword": 0.042
             },
             "relationship_type": "Prevents"
           },
@@ -1231,12 +1231,12 @@
             "aiuc_id": "A003",
             "aiuc_title": "Limit AI agent data collection",
             "aiuc_domain": "Data & Privacy",
-            "score": 0.362,
+            "score": 0.363,
             "confidence": "Related",
             "signals": {
               "reference_bridge": 0.167,
               "semantic": 0.782,
-              "keyword": 0.068
+              "keyword": 0.07
             },
             "relationship_type": "Prevents"
           },
@@ -1244,12 +1244,12 @@
             "aiuc_id": "B007",
             "aiuc_title": "Enforce user access privileges to AI systems",
             "aiuc_domain": "Security",
-            "score": 0.361,
+            "score": 0.362,
             "confidence": "Related",
             "signals": {
               "reference_bridge": 0.167,
               "semantic": 0.771,
-              "keyword": 0.082
+              "keyword": 0.086
             },
             "relationship_type": "Prevents"
           }
@@ -1269,7 +1269,7 @@
             "signals": {
               "reference_bridge": 0.4,
               "semantic": 0.631,
-              "keyword": 0.059
+              "keyword": 0.06
             },
             "relationship_type": "Prevents"
           },
@@ -1354,7 +1354,7 @@
           },
           {
             "owasp_id": "ASI09",
-            "score": 0.402,
+            "score": 0.403,
             "confidence": "Related"
           }
         ]
@@ -1371,7 +1371,7 @@
           },
           {
             "owasp_id": "ASI09",
-            "score": 0.382,
+            "score": 0.383,
             "confidence": "Related"
           },
           {
@@ -1393,7 +1393,7 @@
           },
           {
             "owasp_id": "ASI09",
-            "score": 0.402,
+            "score": 0.403,
             "confidence": "Related"
           },
           {
@@ -1800,7 +1800,7 @@
           },
           {
             "owasp_id": "ASI01",
-            "score": 0.439,
+            "score": 0.44,
             "confidence": "Related"
           },
           {
@@ -1827,7 +1827,7 @@
           },
           {
             "owasp_id": "ASI01",
-            "score": 0.439,
+            "score": 0.44,
             "confidence": "Related"
           },
           {
@@ -1849,7 +1849,7 @@
         "mappings": [
           {
             "owasp_id": "ASI01",
-            "score": 0.459,
+            "score": 0.46,
             "confidence": "Related"
           },
           {
@@ -1881,7 +1881,7 @@
           },
           {
             "owasp_id": "ASI01",
-            "score": 0.439,
+            "score": 0.44,
             "confidence": "Related"
           },
           {
@@ -1913,7 +1913,7 @@
           },
           {
             "owasp_id": "ASI01",
-            "score": 0.419,
+            "score": 0.42,
             "confidence": "Related"
           },
           {
@@ -1952,12 +1952,12 @@
           },
           {
             "owasp_id": "ASI02",
-            "score": 0.418,
+            "score": 0.419,
             "confidence": "Related"
           },
           {
             "owasp_id": "ASI09",
-            "score": 0.381,
+            "score": 0.382,
             "confidence": "Related"
           }
         ]
@@ -1979,12 +1979,12 @@
           },
           {
             "owasp_id": "ASI02",
-            "score": 0.398,
+            "score": 0.399,
             "confidence": "Related"
           },
           {
             "owasp_id": "ASI09",
-            "score": 0.361,
+            "score": 0.362,
             "confidence": "Related"
           }
         ]
@@ -1996,7 +1996,7 @@
         "mappings": [
           {
             "owasp_id": "ASI04",
-            "score": 0.371,
+            "score": 0.37,
             "confidence": "Related"
           }
         ]
@@ -2014,7 +2014,7 @@
         "mappings": [
           {
             "owasp_id": "ASI04",
-            "score": 0.351,
+            "score": 0.35,
             "confidence": "Related"
           }
         ]
@@ -2339,7 +2339,7 @@
         "mappings": [
           {
             "owasp_id": "ASI09",
-            "score": 0.356,
+            "score": 0.355,
             "confidence": "Related"
           }
         ]
@@ -2626,7 +2626,7 @@
         "mappings": [
           {
             "owasp_id": "ASI09",
-            "score": 0.405,
+            "score": 0.406,
             "confidence": "Related"
           },
           {
@@ -2853,7 +2853,7 @@
           {
             "activity_id": "B005.3",
             "parent_control": "B005",
-            "score": 0.459,
+            "score": 0.46,
             "confidence": "Related"
           },
           {
@@ -2871,25 +2871,25 @@
           {
             "activity_id": "B005.1",
             "parent_control": "B005",
-            "score": 0.439,
+            "score": 0.44,
             "confidence": "Related"
           },
           {
             "activity_id": "B005.2",
             "parent_control": "B005",
-            "score": 0.439,
+            "score": 0.44,
             "confidence": "Related"
           },
           {
             "activity_id": "B005.4",
             "parent_control": "B005",
-            "score": 0.439,
+            "score": 0.44,
             "confidence": "Related"
           },
           {
             "activity_id": "B005.5",
             "parent_control": "B005",
-            "score": 0.419,
+            "score": 0.42,
             "confidence": "Related"
           },
           {
@@ -2979,13 +2979,13 @@
           {
             "activity_id": "B007.1",
             "parent_control": "B007",
-            "score": 0.418,
+            "score": 0.419,
             "confidence": "Related"
           },
           {
             "activity_id": "B007.2",
             "parent_control": "B007",
-            "score": 0.398,
+            "score": 0.399,
             "confidence": "Related"
           },
           {
@@ -3093,13 +3093,13 @@
           {
             "activity_id": "B008.1",
             "parent_control": "B008",
-            "score": 0.371,
+            "score": 0.37,
             "confidence": "Related"
           },
           {
             "activity_id": "B008.3",
             "parent_control": "B008",
-            "score": 0.351,
+            "score": 0.35,
             "confidence": "Related"
           }
         ]
@@ -3471,19 +3471,19 @@
           {
             "activity_id": "E009.1",
             "parent_control": "E009",
-            "score": 0.405,
+            "score": 0.406,
             "confidence": "Related"
           },
           {
             "activity_id": "A003.1",
             "parent_control": "A003",
-            "score": 0.402,
+            "score": 0.403,
             "confidence": "Related"
           },
           {
             "activity_id": "A003.3",
             "parent_control": "A003",
-            "score": 0.402,
+            "score": 0.403,
             "confidence": "Related"
           },
           {
@@ -3513,13 +3513,13 @@
           {
             "activity_id": "A003.2",
             "parent_control": "A003",
-            "score": 0.382,
+            "score": 0.383,
             "confidence": "Related"
           },
           {
             "activity_id": "B007.1",
             "parent_control": "B007",
-            "score": 0.381,
+            "score": 0.382,
             "confidence": "Related"
           },
           {
@@ -3547,15 +3547,15 @@
             "confidence": "Related"
           },
           {
-            "activity_id": "E016.4",
-            "parent_control": "E016",
+            "activity_id": "B007.2",
+            "parent_control": "B007",
             "score": 0.362,
             "confidence": "Related"
           },
           {
-            "activity_id": "B007.2",
-            "parent_control": "B007",
-            "score": 0.361,
+            "activity_id": "E016.4",
+            "parent_control": "E016",
+            "score": 0.362,
             "confidence": "Related"
           },
           {
@@ -3573,7 +3573,7 @@
           {
             "activity_id": "C008.1",
             "parent_control": "C008",
-            "score": 0.356,
+            "score": 0.355,
             "confidence": "Related"
           }
         ]
