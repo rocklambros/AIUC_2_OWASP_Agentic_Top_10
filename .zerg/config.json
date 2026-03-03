@@ -1,0 +1,9 @@
+{
+  "project": "aiuc-owasp-agentic-top10",
+  "version": "0.1.0",
+  "languages": ["python", "json"],
+  "frameworks": [],
+  "workers": 3,
+  "security": "standard",
+  "initialized": "2026-03-03"
+}
