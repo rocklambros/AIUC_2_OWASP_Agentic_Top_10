@@ -27,13 +27,13 @@ EXPECTED_SHEETS: list[str] = [
 
 EXPECTED_SECTION_HEADERS: list[str] = [
     "Workbook Overview",
+    "Rationale Taxonomy (Function Classes)",
+    "Relevance Classification",
     "Tab-by-Tab Guide",
     "Understanding Confidence Tiers",
-    "Relationship Types",
     "Scoring Methodology",
     "AIUC-1 Domains Quick Reference",
     "OWASP Agentic Top 10 (2026) Quick Reference",
-    "How to Get Started",
 ]
 
 # Expected first header cell (row 1, column 1) for each data sheet.
