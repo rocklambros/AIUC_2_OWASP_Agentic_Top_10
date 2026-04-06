@@ -6,14 +6,16 @@ Usage:
 Examples:
     python scripts/run_mapping.py
     python scripts/run_mapping.py --output-dir results
-    python scripts/run_mapping.py --w-ref 0.50 --w-sem 0.30 --w-kw 0.20
+    python scripts/run_mapping.py --w-ref 0.35 --w-sem 0.25 --w-kw 0.15 --w-func 0.25
 """
 
 from __future__ import annotations
 
 import argparse
+import json
 import logging
 import sys
+from collections import Counter
 from pathlib import Path
 
 # Ensure project root is importable
@@ -61,6 +63,12 @@ def main() -> None:
     parser.add_argument("--t-tangential", type=float, default=0.20, help="Tangential threshold")
     parser.add_argument("--t-gov-floor", type=float, default=0.22, help="Governance floor")
 
+    parser.add_argument(
+        "--validate-schema",
+        action=argparse.BooleanOptionalAction,
+        default=True,
+        help="Validate JSON output against v2 schema (default: True)",
+    )
     parser.add_argument("-v", "--verbose", action="store_true", help="Verbose logging")
 
     args = parser.parse_args()
@@ -117,19 +125,56 @@ def main() -> None:
     excel_path, json_path = generate_outputs(mapping, args.output_dir)
 
     # Summary
-    ctrl_mappings = sum(len(c.mappings) for c in mapping.control_level.aiuc_to_owasp)
-    direct_count = sum(
-        1
+    all_mappings = [
+        m
         for c in mapping.control_level.aiuc_to_owasp
         for m in c.mappings
-        if m.confidence.value == "Direct"
+    ]
+    total = len(all_mappings)
+    direct_count = sum(
+        1 for m in all_mappings if m.confidence.value == "Direct"
     )
-    related_count = ctrl_mappings - direct_count
+    primary_count = sum(
+        1 for m in all_mappings if m.relevance.value == "Primary"
+    )
+    secondary_count = total - primary_count
+
+    # Rationale distribution
+    rationale_dist: Counter[str] = Counter(
+        m.rationale_code.value for m in all_mappings
+    )
 
     print("\nDone!")
-    print(f"  Control-level: {ctrl_mappings} ({direct_count} Direct, {related_count} Related)")
+    print(f"  Control-level: {total} mappings")
+    print(f"    Confidence:  {direct_count} Direct, {total - direct_count} Related")
+    print(f"    Relevance:   {primary_count} Primary, {secondary_count} Secondary")
+    print(f"    Rationale:   {dict(rationale_dist.most_common())}")
     print(f"  Excel: {excel_path}")
     print(f"  JSON:  {json_path}")
+
+    # Schema validation
+    if args.validate_schema:
+        schema_path = (
+            Path(__file__).resolve().parent.parent
+            / "schemas"
+            / "crosswalk-mapping-v2.schema.json"
+        )
+        if schema_path.exists():
+            import jsonschema
+
+            with open(schema_path) as sf:
+                schema = json.load(sf)
+            with open(json_path) as df:
+                data = json.load(df)
+            try:
+                jsonschema.validate(data, schema)
+                print("  Schema validation: PASSED")
+            except jsonschema.ValidationError as e:
+                print(f"  Schema validation: FAILED - {e.message}")
+                print(f"    Path: {list(e.absolute_path)}")
+                sys.exit(1)
+        else:
+            print(f"  Schema validation: SKIPPED (schema not found at {schema_path})")
 
 
 if __name__ == "__main__":
