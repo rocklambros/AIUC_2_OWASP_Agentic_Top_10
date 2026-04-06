@@ -1,825 +1,1716 @@
 {
   "metadata": {
-    "generated_at": "2026-03-03T21:09:25.966097",
-    "methodology": "multi-signal-hybrid",
-    "version": "1.0",
-    "weights": {
-      "reference_bridge": 0.45,
-      "semantic": 0.35,
-      "keyword": 0.2
+    "schema_version": "2.0",
+    "generated_at": "2026-04-06T17:53:17.347220+00:00",
+    "methodology": "multi-signal-hybrid-v2",
+    "source_standard": {
+      "name": "AIUC-1",
+      "version": "1.0",
+      "url": "https://www.aiuc-1.com",
+      "controls": 51,
+      "domains": 6
     },
-    "thresholds": {
-      "direct": 0.55,
-      "related": 0.35,
-      "tangential": 0.2
+    "target_standard": {
+      "name": "OWASP Top 10 for Agentic Applications",
+      "version": "2026",
+      "url": "https://owasp.org/www-project-top-10-for-large-language-model-applications/",
+      "entries": 10
+    },
+    "pipeline": {
+      "signals": {
+        "reference_bridge": {
+          "weight": 0.467,
+          "technique": "Jaccard similarity on shared OWASP LLM Top 10 references"
+        },
+        "semantic": {
+          "weight": 0.333,
+          "technique": "Sentence-transformer cosine similarity (all-MiniLM-L6-v2) with prevention-guideline boosting and Z-score normalization"
+        },
+        "keyword": {
+          "weight": 0.2,
+          "technique": "TF-IDF cosine similarity with domain-specific synonym expansion"
+        },
+        "function_match": {
+          "weight": 0.5,
+          "technique": "Multiplicative boost (not additive): content * (1 + boost) when control function class is in threat function profile"
+        }
+      },
+      "thresholds": {
+        "direct": 0.55,
+        "related": 0.35,
+        "governance_floor": 0.22,
+        "tangential": 0.2
+      }
+    },
+    "classification": {
+      "rationale_taxonomy": {
+        "PREV": "Prevent",
+        "SCOPE": "Constrain scope",
+        "GATE": "Human gate",
+        "DETECT": "Detect and trace",
+        "VALID": "Validate and test",
+        "GOVERN": "Policy and governance",
+        "ISOLATE": "Isolate and contain",
+        "DISCLOSE": "Disclose and calibrate"
+      },
+      "relevance_levels": [
+        "Primary",
+        "Secondary"
+      ],
+      "classification_accuracy": {
+        "training": {
+          "standard": "AIUC-1",
+          "mappings": 119,
+          "rationale_accuracy": 1.0,
+          "relevance_accuracy": 0.992
+        },
+        "validation": {
+          "standard": "NIST AI RMF 1.0",
+          "mappings": 66,
+          "rationale_accuracy": 1.0,
+          "relevance_accuracy": 0.848
+        }
+      }
+    }
+  },
+  "summary": {
+    "controls_mapped": "33 / 51",
+    "controls_unmapped": 18,
+    "owasp_entries_with_matches": 10,
+    "total_mappings": 73,
+    "primary_mappings": 51,
+    "secondary_mappings": 22,
+    "rationale_distribution": {
+      "SCOPE": 19,
+      "ISOLATE": 8,
+      "VALID": 12,
+      "PREV": 16,
+      "GATE": 4,
+      "GOVERN": 7,
+      "DETECT": 6,
+      "DISCLOSE": 1
     }
   },
   "control_level": {
-    "aiuc_to_owasp": [
+    "source_to_owasp": [
       {
-        "aiuc_id": "A001",
-        "aiuc_title": "Establish input data policy",
-        "aiuc_domain": "Data & Privacy",
+        "control_id": "A001",
+        "control_title": "Establish input data policy",
+        "domain": "Data & Privacy",
+        "function_class": "GOVERN",
+        "mapping_count": 0,
+        "primary_count": 0,
+        "secondary_count": 0,
         "mappings": []
       },
       {
-        "aiuc_id": "A002",
-        "aiuc_title": "Establish output data policy",
-        "aiuc_domain": "Data & Privacy",
+        "control_id": "A002",
+        "control_title": "Establish output data policy",
+        "domain": "Data & Privacy",
+        "function_class": "GOVERN",
+        "mapping_count": 0,
+        "primary_count": 0,
+        "secondary_count": 0,
         "mappings": []
       },
       {
-        "aiuc_id": "A003",
-        "aiuc_title": "Limit AI agent data collection",
-        "aiuc_domain": "Data & Privacy",
-        "mappings": [
-          {
-            "owasp_id": "ASI02",
-            "owasp_title": "Tool Misuse and Exploitation",
-            "score": 0.387,
-            "confidence": "Related",
-            "signals": {
-              "reference_bridge": 0.333,
-              "semantic": 0.639,
-              "keyword": 0.064
-            },
-            "relationship_type": "Prevents"
-          },
-          {
-            "owasp_id": "ASI09",
-            "owasp_title": "Human-Agent TrustExploitation",
-            "score": 0.363,
-            "confidence": "Related",
-            "signals": {
-              "reference_bridge": 0.167,
-              "semantic": 0.782,
-              "keyword": 0.07
-            },
-            "relationship_type": "Prevents"
-          }
-        ]
-      },
-      {
-        "aiuc_id": "A004",
-        "aiuc_title": "Protect IP & trade secrets",
-        "aiuc_domain": "Data & Privacy",
-        "mappings": [
-          {
-            "owasp_id": "ASI04",
-            "owasp_title": "Agentic Supply ChainVulnerabilities",
-            "score": 0.419,
-            "confidence": "Related",
-            "signals": {
-              "reference_bridge": 0.333,
-              "semantic": 0.754,
-              "keyword": 0.025
-            },
-            "relationship_type": "Prevents"
-          }
-        ]
-      },
-      {
-        "aiuc_id": "A005",
-        "aiuc_title": "Prevent cross-customer data exposure",
-        "aiuc_domain": "Data & Privacy",
-        "mappings": []
-      },
-      {
-        "aiuc_id": "A006",
-        "aiuc_title": "Prevent PII leakage",
-        "aiuc_domain": "Data & Privacy",
-        "mappings": []
-      },
-      {
-        "aiuc_id": "A007",
-        "aiuc_title": "Prevent IP violations",
-        "aiuc_domain": "Data & Privacy",
-        "mappings": [
-          {
-            "owasp_id": "ASI04",
-            "owasp_title": "Agentic Supply ChainVulnerabilities",
-            "score": 0.461,
-            "confidence": "Related",
-            "signals": {
-              "reference_bridge": 0.5,
-              "semantic": 0.653,
-              "keyword": 0.034
-            },
-            "relationship_type": "Prevents"
-          }
-        ]
-      },
-      {
-        "aiuc_id": "B001",
-        "aiuc_title": "Third-party testing of adversarial robustness",
-        "aiuc_domain": "Security",
-        "mappings": [
-          {
-            "owasp_id": "ASI05",
-            "owasp_title": "Unexpected CodeExecution (RCE)",
-            "score": 0.521,
-            "confidence": "Related",
-            "signals": {
-              "reference_bridge": 0.5,
-              "semantic": 0.811,
-              "keyword": 0.061
-            },
-            "relationship_type": "Prevents"
-          },
-          {
-            "owasp_id": "ASI06",
-            "owasp_title": "Memory & Context Poisoning",
-            "score": 0.519,
-            "confidence": "Related",
-            "signals": {
-              "reference_bridge": 0.75,
-              "semantic": 0.489,
-              "keyword": 0.054
-            },
-            "relationship_type": "Prevents"
-          },
-          {
-            "owasp_id": "ASI01",
-            "owasp_title": "Agent Goal Hijack",
-            "score": 0.357,
-            "confidence": "Related",
-            "signals": {
-              "reference_bridge": 0.25,
-              "semantic": 0.664,
-              "keyword": 0.063
-            },
-            "relationship_type": "Prevents"
-          }
-        ]
-      },
-      {
-        "aiuc_id": "B002",
-        "aiuc_title": "Detect adversarial input",
-        "aiuc_domain": "Security",
-        "mappings": [
-          {
-            "owasp_id": "ASI01",
-            "owasp_title": "Agent Goal Hijack",
-            "score": 0.453,
-            "confidence": "Related",
-            "signals": {
-              "reference_bridge": 0.333,
-              "semantic": 0.799,
-              "keyword": 0.117
-            },
-            "relationship_type": "Detects"
-          },
-          {
-            "owasp_id": "ASI06",
-            "owasp_title": "Memory & Context Poisoning",
-            "score": 0.443,
-            "confidence": "Related",
-            "signals": {
-              "reference_bridge": 0.5,
-              "semantic": 0.573,
-              "keyword": 0.09
-            },
-            "relationship_type": "Detects"
-          },
-          {
-            "owasp_id": "ASI05",
-            "owasp_title": "Unexpected CodeExecution (RCE)",
-            "score": 0.432,
-            "confidence": "Related",
-            "signals": {
-              "reference_bridge": 0.25,
-              "semantic": 0.844,
-              "keyword": 0.121
-            },
-            "relationship_type": "Detects"
-          }
-        ]
-      },
-      {
-        "aiuc_id": "B003",
-        "aiuc_title": "Manage public release of technical details",
-        "aiuc_domain": "Security",
-        "mappings": [
-          {
-            "owasp_id": "ASI10",
-            "owasp_title": "Rogue Agents",
-            "score": 0.389,
-            "confidence": "Related",
-            "signals": {
-              "reference_bridge": 0.2,
-              "semantic": 0.815,
-              "keyword": 0.067
-            },
-            "relationship_type": "Prevents"
-          }
-        ]
-      },
-      {
-        "aiuc_id": "B004",
-        "aiuc_title": "Prevent AI endpoint scraping",
-        "aiuc_domain": "Security",
-        "mappings": [
-          {
-            "owasp_id": "ASI09",
-            "owasp_title": "Human-Agent TrustExploitation",
-            "score": 0.365,
-            "confidence": "Related",
-            "signals": {
-              "reference_bridge": 0.143,
-              "semantic": 0.828,
-              "keyword": 0.054
-            },
-            "relationship_type": "Prevents"
-          }
-        ]
-      },
-      {
-        "aiuc_id": "B005",
-        "aiuc_title": "Implement real-time input filtering",
-        "aiuc_domain": "Security",
-        "mappings": [
-          {
-            "owasp_id": "ASI05",
-            "owasp_title": "Unexpected CodeExecution (RCE)",
-            "score": 0.431,
-            "confidence": "Related",
-            "signals": {
-              "reference_bridge": 0.25,
-              "semantic": 0.849,
-              "keyword": 0.106
-            },
-            "relationship_type": "Detects"
-          },
-          {
-            "owasp_id": "ASI01",
-            "owasp_title": "Agent Goal Hijack",
-            "score": 0.42,
-            "confidence": "Related",
-            "signals": {
-              "reference_bridge": 0.333,
-              "semantic": 0.707,
-              "keyword": 0.112
-            },
-            "relationship_type": "Detects"
-          },
-          {
-            "owasp_id": "ASI06",
-            "owasp_title": "Memory & Context Poisoning",
-            "score": 0.417,
-            "confidence": "Related",
-            "signals": {
-              "reference_bridge": 0.5,
-              "semantic": 0.513,
-              "keyword": 0.065
-            },
-            "relationship_type": "Detects"
-          },
-          {
-            "owasp_id": "ASI08",
-            "owasp_title": "Cascading Failures",
-            "score": 0.369,
-            "confidence": "Related",
-            "signals": {
-              "reference_bridge": 0.5,
-              "semantic": 0.38,
-              "keyword": 0.057
-            },
-            "relationship_type": "Detects"
-          }
-        ]
-      },
-      {
-        "aiuc_id": "B006",
-        "aiuc_title": "Prevent unauthorized AI agent actions",
-        "aiuc_domain": "Security",
-        "mappings": []
-      },
-      {
-        "aiuc_id": "B007",
-        "aiuc_title": "Enforce user access privileges to AI systems",
-        "aiuc_domain": "Security",
+        "control_id": "A003",
+        "control_title": "Limit AI agent data collection",
+        "domain": "Data & Privacy",
+        "function_class": "SCOPE",
+        "mapping_count": 3,
+        "primary_count": 1,
+        "secondary_count": 2,
         "mappings": [
           {
             "owasp_id": "ASI03",
             "owasp_title": "Identity and PrivilegeAbuse",
-            "score": 0.484,
-            "confidence": "Related",
+            "relevance": "Secondary",
+            "rationale_code": "SCOPE",
+            "rationale_label": "Constrain scope",
+            "score": 0.569,
             "signals": {
-              "reference_bridge": 0.5,
-              "semantic": 0.685,
-              "keyword": 0.096
-            },
-            "relationship_type": "Prevents"
-          },
-          {
-            "owasp_id": "ASI10",
-            "owasp_title": "Rogue Agents",
-            "score": 0.413,
-            "confidence": "Related",
-            "signals": {
-              "reference_bridge": 0.4,
-              "semantic": 0.631,
-              "keyword": 0.06
-            },
-            "relationship_type": "Prevents"
+              "reference_bridge": 0.2,
+              "semantic": 0.795,
+              "keyword": 0.107
+            }
           },
           {
             "owasp_id": "ASI02",
             "owasp_title": "Tool Misuse and Exploitation",
-            "score": 0.399,
-            "confidence": "Related",
+            "relevance": "Primary",
+            "rationale_code": "SCOPE",
+            "rationale_label": "Constrain scope",
+            "score": 0.559,
             "signals": {
               "reference_bridge": 0.333,
-              "semantic": 0.667,
-              "keyword": 0.076
-            },
-            "relationship_type": "Prevents"
+              "semantic": 0.612,
+              "keyword": 0.065
+            }
           },
           {
             "owasp_id": "ASI09",
             "owasp_title": "Human-Agent TrustExploitation",
-            "score": 0.362,
-            "confidence": "Related",
+            "relevance": "Secondary",
+            "rationale_code": "SCOPE",
+            "rationale_label": "Constrain scope",
+            "score": 0.535,
             "signals": {
               "reference_bridge": 0.167,
-              "semantic": 0.771,
-              "keyword": 0.086
-            },
-            "relationship_type": "Prevents"
+              "semantic": 0.795,
+              "keyword": 0.07
+            }
           }
         ]
       },
       {
-        "aiuc_id": "B008",
-        "aiuc_title": "Protect model deployment environment",
-        "aiuc_domain": "Security",
-        "mappings": []
-      },
-      {
-        "aiuc_id": "B009",
-        "aiuc_title": "Limit output over-exposure",
-        "aiuc_domain": "Security",
+        "control_id": "A004",
+        "control_title": "Protect IP & trade secrets",
+        "domain": "Data & Privacy",
+        "function_class": "SCOPE",
+        "mapping_count": 1,
+        "primary_count": 0,
+        "secondary_count": 1,
         "mappings": [
           {
-            "owasp_id": "ASI10",
-            "owasp_title": "Rogue Agents",
-            "score": 0.396,
-            "confidence": "Related",
+            "owasp_id": "ASI04",
+            "owasp_title": "Agentic Supply ChainVulnerabilities",
+            "relevance": "Secondary",
+            "rationale_code": "SCOPE",
+            "rationale_label": "Constrain scope",
+            "score": 0.609,
             "signals": {
               "reference_bridge": 0.333,
-              "semantic": 0.696,
-              "keyword": 0.014
-            },
-            "relationship_type": "Prevents"
-          },
+              "semantic": 0.735,
+              "keyword": 0.026
+            }
+          }
+        ]
+      },
+      {
+        "control_id": "A005",
+        "control_title": "Prevent cross-customer data exposure",
+        "domain": "Data & Privacy",
+        "function_class": "ISOLATE",
+        "mapping_count": 2,
+        "primary_count": 2,
+        "secondary_count": 0,
+        "mappings": [
           {
-            "owasp_id": "ASI05",
-            "owasp_title": "Unexpected CodeExecution (RCE)",
-            "score": 0.38,
-            "confidence": "Related",
+            "owasp_id": "ASI06",
+            "owasp_title": "Memory & Context Poisoning",
+            "relevance": "Primary",
+            "rationale_code": "ISOLATE",
+            "rationale_label": "Isolate and contain",
+            "score": 0.605,
             "signals": {
               "reference_bridge": 0.2,
-              "semantic": 0.822,
-              "keyword": 0.014
-            },
-            "relationship_type": "Prevents"
+              "semantic": 0.895,
+              "keyword": 0.061
+            }
+          },
+          {
+            "owasp_id": "ASI03",
+            "owasp_title": "Identity and PrivilegeAbuse",
+            "relevance": "Primary",
+            "rationale_code": "ISOLATE",
+            "rationale_label": "Isolate and contain",
+            "score": 0.362,
+            "signals": {
+              "reference_bridge": 0.2,
+              "semantic": 0.399,
+              "keyword": 0.075
+            }
           }
         ]
       },
       {
-        "aiuc_id": "C001",
-        "aiuc_title": "Define AI risk taxonomy",
-        "aiuc_domain": "Safety",
-        "mappings": []
-      },
-      {
-        "aiuc_id": "C002",
-        "aiuc_title": "Conduct pre-deployment testing",
-        "aiuc_domain": "Safety",
-        "mappings": []
-      },
-      {
-        "aiuc_id": "C003",
-        "aiuc_title": "Prevent harmful outputs",
-        "aiuc_domain": "Safety",
+        "control_id": "A006",
+        "control_title": "Prevent PII leakage",
+        "domain": "Data & Privacy",
+        "function_class": "ISOLATE",
+        "mapping_count": 3,
+        "primary_count": 3,
+        "secondary_count": 0,
         "mappings": [
           {
-            "owasp_id": "ASI09",
-            "owasp_title": "Human-Agent TrustExploitation",
-            "score": 0.558,
-            "confidence": "Direct",
+            "owasp_id": "ASI10",
+            "owasp_title": "Rogue Agents",
+            "relevance": "Primary",
+            "rationale_code": "ISOLATE",
+            "rationale_label": "Isolate and contain",
+            "score": 0.484,
             "signals": {
-              "reference_bridge": 0.5,
-              "semantic": 0.888,
-              "keyword": 0.113
-            },
-            "relationship_type": "Prevents"
-          }
-        ]
-      },
-      {
-        "aiuc_id": "C004",
-        "aiuc_title": "Prevent out-of-scope outputs",
-        "aiuc_domain": "Safety",
-        "mappings": [
+              "reference_bridge": 0.167,
+              "semantic": 0.708,
+              "keyword": 0.046
+            }
+          },
           {
-            "owasp_id": "ASI05",
-            "owasp_title": "Unexpected CodeExecution (RCE)",
-            "score": 0.458,
-            "confidence": "Related",
+            "owasp_id": "ASI07",
+            "owasp_title": "Insecure Inter-AgentCommunication",
+            "relevance": "Primary",
+            "rationale_code": "ISOLATE",
+            "rationale_label": "Isolate and contain",
+            "score": 0.405,
             "signals": {
-              "reference_bridge": 0.5,
-              "semantic": 0.659,
-              "keyword": 0.011
-            },
-            "relationship_type": "Prevents"
-          }
-        ]
-      },
-      {
-        "aiuc_id": "C005",
-        "aiuc_title": "Prevent customer-defined high risk outputs",
-        "aiuc_domain": "Safety",
-        "mappings": [
-          {
-            "owasp_id": "ASI09",
-            "owasp_title": "Human-Agent TrustExploitation",
-            "score": 0.397,
-            "confidence": "Related",
-            "signals": {
-              "reference_bridge": 0.25,
-              "semantic": 0.791,
-              "keyword": 0.038
-            },
-            "relationship_type": "Prevents"
+              "reference_bridge": 0.0,
+              "semantic": 0.758,
+              "keyword": 0.087
+            }
           },
           {
             "owasp_id": "ASI05",
             "owasp_title": "Unexpected CodeExecution (RCE)",
-            "score": 0.371,
-            "confidence": "Related",
+            "relevance": "Primary",
+            "rationale_code": "ISOLATE",
+            "rationale_label": "Isolate and contain",
+            "score": 0.391,
             "signals": {
-              "reference_bridge": 0.5,
-              "semantic": 0.398,
-              "keyword": 0.033
-            },
-            "relationship_type": "Prevents"
+              "reference_bridge": 0.25,
+              "semantic": 0.402,
+              "keyword": 0.05
+            }
           }
         ]
       },
       {
-        "aiuc_id": "C006",
-        "aiuc_title": "Prevent output vulnerabilities",
-        "aiuc_domain": "Safety",
+        "control_id": "A007",
+        "control_title": "Prevent IP violations",
+        "domain": "Data & Privacy",
+        "function_class": "SCOPE",
+        "mapping_count": 1,
+        "primary_count": 0,
+        "secondary_count": 1,
+        "mappings": [
+          {
+            "owasp_id": "ASI04",
+            "owasp_title": "Agentic Supply ChainVulnerabilities",
+            "relevance": "Secondary",
+            "rationale_code": "SCOPE",
+            "rationale_label": "Constrain scope",
+            "score": 0.664,
+            "signals": {
+              "reference_bridge": 0.5,
+              "semantic": 0.609,
+              "keyword": 0.033
+            }
+          }
+        ]
+      },
+      {
+        "control_id": "B001",
+        "control_title": "Third-party testing of adversarial robustness",
+        "domain": "Security",
+        "function_class": "VALID",
+        "mapping_count": 4,
+        "primary_count": 2,
+        "secondary_count": 2,
         "mappings": [
           {
             "owasp_id": "ASI05",
             "owasp_title": "Unexpected CodeExecution (RCE)",
-            "score": 0.57,
-            "confidence": "Direct",
+            "relevance": "Secondary",
+            "rationale_code": "VALID",
+            "rationale_label": "Validate and test",
+            "score": 0.769,
             "signals": {
               "reference_bridge": 0.5,
-              "semantic": 0.909,
-              "keyword": 0.131
-            },
-            "relationship_type": "Prevents"
-          }
-        ]
-      },
-      {
-        "aiuc_id": "C007",
-        "aiuc_title": "Flag high risk outputs",
-        "aiuc_domain": "Safety",
-        "mappings": []
-      },
-      {
-        "aiuc_id": "C008",
-        "aiuc_title": "Monitor AI risk categories",
-        "aiuc_domain": "Safety",
-        "mappings": []
-      },
-      {
-        "aiuc_id": "C009",
-        "aiuc_title": "Enable real-time feedback and intervention",
-        "aiuc_domain": "Safety",
-        "mappings": []
-      },
-      {
-        "aiuc_id": "C010",
-        "aiuc_title": "Third-party testing for harmful outputs",
-        "aiuc_domain": "Safety",
-        "mappings": []
-      },
-      {
-        "aiuc_id": "C011",
-        "aiuc_title": "Third-party testing for out-of-scope outputs",
-        "aiuc_domain": "Safety",
-        "mappings": []
-      },
-      {
-        "aiuc_id": "C012",
-        "aiuc_title": "Third-party testing for customer-defined risk",
-        "aiuc_domain": "Safety",
-        "mappings": []
-      },
-      {
-        "aiuc_id": "D001",
-        "aiuc_title": "Prevent hallucinated outputs",
-        "aiuc_domain": "Reliability",
-        "mappings": [
+              "semantic": 0.801,
+              "keyword": 0.061
+            }
+          },
+          {
+            "owasp_id": "ASI06",
+            "owasp_title": "Memory & Context Poisoning",
+            "relevance": "Primary",
+            "rationale_code": "VALID",
+            "rationale_label": "Validate and test",
+            "score": 0.767,
+            "signals": {
+              "reference_bridge": 0.75,
+              "semantic": 0.45,
+              "keyword": 0.054
+            }
+          },
           {
             "owasp_id": "ASI09",
             "owasp_title": "Human-Agent TrustExploitation",
-            "score": 0.5,
-            "confidence": "Related",
+            "relevance": "Secondary",
+            "rationale_code": "VALID",
+            "rationale_label": "Validate and test",
+            "score": 0.524,
             "signals": {
-              "reference_bridge": 0.5,
-              "semantic": 0.759,
-              "keyword": 0.05
-            },
-            "relationship_type": "Prevents"
-          }
-        ]
-      },
-      {
-        "aiuc_id": "D002",
-        "aiuc_title": "Third-party testing for hallucinations",
-        "aiuc_domain": "Reliability",
-        "mappings": [
+              "reference_bridge": 0.333,
+              "semantic": 0.559,
+              "keyword": 0.036
+            }
+          },
           {
-            "owasp_id": "ASI09",
-            "owasp_title": "Human-Agent TrustExploitation",
-            "score": 0.428,
-            "confidence": "Related",
+            "owasp_id": "ASI01",
+            "owasp_title": "Agent Goal Hijack",
+            "relevance": "Primary",
+            "rationale_code": "VALID",
+            "rationale_label": "Validate and test",
+            "score": 0.513,
             "signals": {
               "reference_bridge": 0.25,
-              "semantic": 0.894,
-              "keyword": 0.013
-            },
-            "relationship_type": "Prevents"
+              "semantic": 0.638,
+              "keyword": 0.063
+            }
+          }
+        ]
+      },
+      {
+        "control_id": "B002",
+        "control_title": "Detect adversarial input",
+        "domain": "Security",
+        "function_class": "PREV",
+        "mapping_count": 5,
+        "primary_count": 2,
+        "secondary_count": 3,
+        "mappings": [
+          {
+            "owasp_id": "ASI01",
+            "owasp_title": "Agent Goal Hijack",
+            "relevance": "Primary",
+            "rationale_code": "PREV",
+            "rationale_label": "Prevent",
+            "score": 0.638,
+            "signals": {
+              "reference_bridge": 0.333,
+              "semantic": 0.739,
+              "keyword": 0.117
+            }
+          },
+          {
+            "owasp_id": "ASI05",
+            "owasp_title": "Unexpected CodeExecution (RCE)",
+            "relevance": "Secondary",
+            "rationale_code": "PREV",
+            "rationale_label": "Prevent",
+            "score": 0.578,
+            "signals": {
+              "reference_bridge": 0.25,
+              "semantic": 0.734,
+              "keyword": 0.122
+            }
+          },
+          {
+            "owasp_id": "ASI06",
+            "owasp_title": "Memory & Context Poisoning",
+            "relevance": "Primary",
+            "rationale_code": "PREV",
+            "rationale_label": "Prevent",
+            "score": 0.57,
+            "signals": {
+              "reference_bridge": 0.5,
+              "semantic": 0.386,
+              "keyword": 0.09
+            }
           },
           {
             "owasp_id": "ASI10",
             "owasp_title": "Rogue Agents",
-            "score": 0.362,
-            "confidence": "Related",
+            "relevance": "Secondary",
+            "rationale_code": "PREV",
+            "rationale_label": "Prevent",
+            "score": 0.557,
+            "signals": {
+              "reference_bridge": 0.167,
+              "semantic": 0.827,
+              "keyword": 0.089
+            }
+          },
+          {
+            "owasp_id": "ASI09",
+            "owasp_title": "Human-Agent TrustExploitation",
+            "relevance": "Secondary",
+            "rationale_code": "PREV",
+            "rationale_label": "Prevent",
+            "score": 0.507,
+            "signals": {
+              "reference_bridge": 0.167,
+              "semantic": 0.73,
+              "keyword": 0.085
+            }
+          }
+        ]
+      },
+      {
+        "control_id": "B003",
+        "control_title": "Manage public release of technical details",
+        "domain": "Security",
+        "function_class": "PREV",
+        "mapping_count": 0,
+        "primary_count": 0,
+        "secondary_count": 0,
+        "mappings": []
+      },
+      {
+        "control_id": "B004",
+        "control_title": "Prevent AI endpoint scraping",
+        "domain": "Security",
+        "function_class": "PREV",
+        "mapping_count": 1,
+        "primary_count": 0,
+        "secondary_count": 1,
+        "mappings": [
+          {
+            "owasp_id": "ASI09",
+            "owasp_title": "Human-Agent TrustExploitation",
+            "relevance": "Secondary",
+            "rationale_code": "PREV",
+            "rationale_label": "Prevent",
+            "score": 0.58,
+            "signals": {
+              "reference_bridge": 0.143,
+              "semantic": 0.931,
+              "keyword": 0.051
+            }
+          }
+        ]
+      },
+      {
+        "control_id": "B005",
+        "control_title": "Implement real-time input filtering",
+        "domain": "Security",
+        "function_class": "PREV",
+        "mapping_count": 4,
+        "primary_count": 2,
+        "secondary_count": 2,
+        "mappings": [
+          {
+            "owasp_id": "ASI08",
+            "owasp_title": "Cascading Failures",
+            "relevance": "Secondary",
+            "rationale_code": "PREV",
+            "rationale_label": "Prevent",
+            "score": 0.66,
+            "signals": {
+              "reference_bridge": 0.5,
+              "semantic": 0.587,
+              "keyword": 0.055
+            }
+          },
+          {
+            "owasp_id": "ASI01",
+            "owasp_title": "Agent Goal Hijack",
+            "relevance": "Primary",
+            "rationale_code": "PREV",
+            "rationale_label": "Prevent",
+            "score": 0.618,
+            "signals": {
+              "reference_bridge": 0.333,
+              "semantic": 0.706,
+              "keyword": 0.107
+            }
+          },
+          {
+            "owasp_id": "ASI10",
+            "owasp_title": "Rogue Agents",
+            "relevance": "Secondary",
+            "rationale_code": "PREV",
+            "rationale_label": "Prevent",
+            "score": 0.533,
+            "signals": {
+              "reference_bridge": 0.167,
+              "semantic": 0.799,
+              "keyword": 0.055
+            }
+          },
+          {
+            "owasp_id": "ASI06",
+            "owasp_title": "Memory & Context Poisoning",
+            "relevance": "Primary",
+            "rationale_code": "PREV",
+            "rationale_label": "Prevent",
+            "score": 0.455,
+            "signals": {
+              "reference_bridge": 0.5,
+              "semantic": 0.17,
+              "keyword": 0.064
+            }
+          }
+        ]
+      },
+      {
+        "control_id": "B006",
+        "control_title": "Prevent unauthorized AI agent actions",
+        "domain": "Security",
+        "function_class": "SCOPE",
+        "mapping_count": 4,
+        "primary_count": 4,
+        "secondary_count": 0,
+        "mappings": [
+          {
+            "owasp_id": "ASI03",
+            "owasp_title": "Identity and PrivilegeAbuse",
+            "relevance": "Primary",
+            "rationale_code": "SCOPE",
+            "rationale_label": "Constrain scope",
+            "score": 0.378,
+            "signals": {
+              "reference_bridge": 0.0,
+              "semantic": 0.687,
+              "keyword": 0.115
+            }
+          },
+          {
+            "owasp_id": "ASI10",
+            "owasp_title": "Rogue Agents",
+            "relevance": "Primary",
+            "rationale_code": "SCOPE",
+            "rationale_label": "Constrain scope",
+            "score": 0.37,
+            "signals": {
+              "reference_bridge": 0.0,
+              "semantic": 0.674,
+              "keyword": 0.112
+            }
+          },
+          {
+            "owasp_id": "ASI01",
+            "owasp_title": "Agent Goal Hijack",
+            "relevance": "Primary",
+            "rationale_code": "SCOPE",
+            "rationale_label": "Constrain scope",
+            "score": 0.364,
+            "signals": {
+              "reference_bridge": 0.0,
+              "semantic": 0.675,
+              "keyword": 0.088
+            }
+          },
+          {
+            "owasp_id": "ASI02",
+            "owasp_title": "Tool Misuse and Exploitation",
+            "relevance": "Primary",
+            "rationale_code": "SCOPE",
+            "rationale_label": "Constrain scope",
+            "score": 0.357,
+            "signals": {
+              "reference_bridge": 0.0,
+              "semantic": 0.654,
+              "keyword": 0.099
+            }
+          }
+        ]
+      },
+      {
+        "control_id": "B007",
+        "control_title": "Enforce user access privileges to AI systems",
+        "domain": "Security",
+        "function_class": "SCOPE",
+        "mapping_count": 4,
+        "primary_count": 2,
+        "secondary_count": 2,
+        "mappings": [
+          {
+            "owasp_id": "ASI03",
+            "owasp_title": "Identity and PrivilegeAbuse",
+            "relevance": "Primary",
+            "rationale_code": "SCOPE",
+            "rationale_label": "Constrain scope",
+            "score": 0.75,
+            "signals": {
+              "reference_bridge": 0.5,
+              "semantic": 0.743,
+              "keyword": 0.095
+            }
+          },
+          {
+            "owasp_id": "ASI02",
+            "owasp_title": "Tool Misuse and Exploitation",
+            "relevance": "Primary",
+            "rationale_code": "SCOPE",
+            "rationale_label": "Constrain scope",
+            "score": 0.625,
+            "signals": {
+              "reference_bridge": 0.333,
+              "semantic": 0.739,
+              "keyword": 0.075
+            }
+          },
+          {
+            "owasp_id": "ASI10",
+            "owasp_title": "Rogue Agents",
+            "relevance": "Secondary",
+            "rationale_code": "SCOPE",
+            "rationale_label": "Constrain scope",
+            "score": 0.574,
+            "signals": {
+              "reference_bridge": 0.4,
+              "semantic": 0.553,
+              "keyword": 0.059
+            }
+          },
+          {
+            "owasp_id": "ASI09",
+            "owasp_title": "Human-Agent TrustExploitation",
+            "relevance": "Secondary",
+            "rationale_code": "SCOPE",
+            "rationale_label": "Constrain scope",
+            "score": 0.536,
+            "signals": {
+              "reference_bridge": 0.167,
+              "semantic": 0.79,
+              "keyword": 0.081
+            }
+          }
+        ]
+      },
+      {
+        "control_id": "B008",
+        "control_title": "Protect model deployment environment",
+        "domain": "Security",
+        "function_class": "ISOLATE",
+        "mapping_count": 3,
+        "primary_count": 3,
+        "secondary_count": 0,
+        "mappings": [
+          {
+            "owasp_id": "ASI04",
+            "owasp_title": "Agentic Supply ChainVulnerabilities",
+            "relevance": "Primary",
+            "rationale_code": "ISOLATE",
+            "rationale_label": "Isolate and contain",
+            "score": 0.42,
+            "signals": {
+              "reference_bridge": 0.0,
+              "semantic": 0.812,
+              "keyword": 0.048
+            }
+          },
+          {
+            "owasp_id": "ASI10",
+            "owasp_title": "Rogue Agents",
+            "relevance": "Primary",
+            "rationale_code": "ISOLATE",
+            "rationale_label": "Isolate and contain",
+            "score": 0.404,
+            "signals": {
+              "reference_bridge": 0.0,
+              "semantic": 0.774,
+              "keyword": 0.059
+            }
+          },
+          {
+            "owasp_id": "ASI07",
+            "owasp_title": "Insecure Inter-AgentCommunication",
+            "relevance": "Primary",
+            "rationale_code": "ISOLATE",
+            "rationale_label": "Isolate and contain",
+            "score": 0.381,
+            "signals": {
+              "reference_bridge": 0.0,
+              "semantic": 0.7,
+              "keyword": 0.104
+            }
+          }
+        ]
+      },
+      {
+        "control_id": "B009",
+        "control_title": "Limit output over-exposure",
+        "domain": "Security",
+        "function_class": "SCOPE",
+        "mapping_count": 1,
+        "primary_count": 0,
+        "secondary_count": 1,
+        "mappings": [
+          {
+            "owasp_id": "ASI09",
+            "owasp_title": "Human-Agent TrustExploitation",
+            "relevance": "Secondary",
+            "rationale_code": "SCOPE",
+            "rationale_label": "Constrain scope",
+            "score": 0.511,
+            "signals": {
+              "reference_bridge": 0.333,
+              "semantic": 0.54,
+              "keyword": 0.027
+            }
+          }
+        ]
+      },
+      {
+        "control_id": "C001",
+        "control_title": "Define AI risk taxonomy",
+        "domain": "Safety",
+        "function_class": "GOVERN",
+        "mapping_count": 0,
+        "primary_count": 0,
+        "secondary_count": 0,
+        "mappings": []
+      },
+      {
+        "control_id": "C002",
+        "control_title": "Conduct pre-deployment testing",
+        "domain": "Safety",
+        "function_class": "VALID",
+        "mapping_count": 0,
+        "primary_count": 0,
+        "secondary_count": 0,
+        "mappings": []
+      },
+      {
+        "control_id": "C003",
+        "control_title": "Prevent harmful outputs",
+        "domain": "Safety",
+        "function_class": "PREV",
+        "mapping_count": 1,
+        "primary_count": 1,
+        "secondary_count": 0,
+        "mappings": [
+          {
+            "owasp_id": "ASI09",
+            "owasp_title": "Human-Agent TrustExploitation",
+            "relevance": "Primary",
+            "rationale_code": "PREV",
+            "rationale_label": "Prevent",
+            "score": 0.814,
+            "signals": {
+              "reference_bridge": 0.5,
+              "semantic": 0.86,
+              "keyword": 0.112
+            }
+          }
+        ]
+      },
+      {
+        "control_id": "C004",
+        "control_title": "Prevent out-of-scope outputs",
+        "domain": "Safety",
+        "function_class": "PREV",
+        "mapping_count": 1,
+        "primary_count": 0,
+        "secondary_count": 1,
+        "mappings": [
+          {
+            "owasp_id": "ASI05",
+            "owasp_title": "Unexpected CodeExecution (RCE)",
+            "relevance": "Secondary",
+            "rationale_code": "PREV",
+            "rationale_label": "Prevent",
+            "score": 0.505,
+            "signals": {
+              "reference_bridge": 0.5,
+              "semantic": 0.303,
+              "keyword": 0.011
+            }
+          }
+        ]
+      },
+      {
+        "control_id": "C005",
+        "control_title": "Prevent customer-defined high risk outputs",
+        "domain": "Safety",
+        "function_class": "PREV",
+        "mapping_count": 1,
+        "primary_count": 0,
+        "secondary_count": 1,
+        "mappings": [
+          {
+            "owasp_id": "ASI09",
+            "owasp_title": "Human-Agent TrustExploitation",
+            "relevance": "Secondary",
+            "rationale_code": "PREV",
+            "rationale_label": "Prevent",
+            "score": 0.612,
+            "signals": {
+              "reference_bridge": 0.25,
+              "semantic": 0.852,
+              "keyword": 0.039
+            }
+          }
+        ]
+      },
+      {
+        "control_id": "C006",
+        "control_title": "Prevent output vulnerabilities",
+        "domain": "Safety",
+        "function_class": "PREV",
+        "mapping_count": 1,
+        "primary_count": 1,
+        "secondary_count": 0,
+        "mappings": [
+          {
+            "owasp_id": "ASI05",
+            "owasp_title": "Unexpected CodeExecution (RCE)",
+            "relevance": "Primary",
+            "rationale_code": "PREV",
+            "rationale_label": "Prevent",
+            "score": 0.817,
+            "signals": {
+              "reference_bridge": 0.5,
+              "semantic": 0.851,
+              "keyword": 0.14
+            }
+          }
+        ]
+      },
+      {
+        "control_id": "C007",
+        "control_title": "Flag high risk outputs",
+        "domain": "Safety",
+        "function_class": "GATE",
+        "mapping_count": 2,
+        "primary_count": 2,
+        "secondary_count": 0,
+        "mappings": [
+          {
+            "owasp_id": "ASI09",
+            "owasp_title": "Human-Agent TrustExploitation",
+            "relevance": "Primary",
+            "rationale_code": "GATE",
+            "rationale_label": "Human gate",
+            "score": 0.458,
+            "signals": {
+              "reference_bridge": 0.0,
+              "semantic": 0.871,
+              "keyword": 0.076
+            }
+          },
+          {
+            "owasp_id": "ASI01",
+            "owasp_title": "Agent Goal Hijack",
+            "relevance": "Primary",
+            "rationale_code": "GATE",
+            "rationale_label": "Human gate",
+            "score": 0.407,
+            "signals": {
+              "reference_bridge": 0.0,
+              "semantic": 0.783,
+              "keyword": 0.054
+            }
+          }
+        ]
+      },
+      {
+        "control_id": "C008",
+        "control_title": "Monitor AI risk categories",
+        "domain": "Safety",
+        "function_class": "DETECT",
+        "mapping_count": 0,
+        "primary_count": 0,
+        "secondary_count": 0,
+        "mappings": []
+      },
+      {
+        "control_id": "C009",
+        "control_title": "Enable real-time feedback and intervention",
+        "domain": "Safety",
+        "function_class": "GATE",
+        "mapping_count": 2,
+        "primary_count": 2,
+        "secondary_count": 0,
+        "mappings": [
+          {
+            "owasp_id": "ASI09",
+            "owasp_title": "Human-Agent TrustExploitation",
+            "relevance": "Primary",
+            "rationale_code": "GATE",
+            "rationale_label": "Human gate",
+            "score": 0.433,
+            "signals": {
+              "reference_bridge": 0.0,
+              "semantic": 0.846,
+              "keyword": 0.035
+            }
+          },
+          {
+            "owasp_id": "ASI01",
+            "owasp_title": "Agent Goal Hijack",
+            "relevance": "Primary",
+            "rationale_code": "GATE",
+            "rationale_label": "Human gate",
+            "score": 0.383,
+            "signals": {
+              "reference_bridge": 0.0,
+              "semantic": 0.75,
+              "keyword": 0.029
+            }
+          }
+        ]
+      },
+      {
+        "control_id": "C010",
+        "control_title": "Third-party testing for harmful outputs",
+        "domain": "Safety",
+        "function_class": "VALID",
+        "mapping_count": 1,
+        "primary_count": 1,
+        "secondary_count": 0,
+        "mappings": [
+          {
+            "owasp_id": "ASI09",
+            "owasp_title": "Human-Agent TrustExploitation",
+            "relevance": "Primary",
+            "rationale_code": "VALID",
+            "rationale_label": "Validate and test",
+            "score": 0.376,
+            "signals": {
+              "reference_bridge": 0.0,
+              "semantic": 0.739,
+              "keyword": 0.023
+            }
+          }
+        ]
+      },
+      {
+        "control_id": "C011",
+        "control_title": "Third-party testing for out-of-scope outputs",
+        "domain": "Safety",
+        "function_class": "VALID",
+        "mapping_count": 0,
+        "primary_count": 0,
+        "secondary_count": 0,
+        "mappings": []
+      },
+      {
+        "control_id": "C012",
+        "control_title": "Third-party testing for customer-defined risk",
+        "domain": "Safety",
+        "function_class": "VALID",
+        "mapping_count": 0,
+        "primary_count": 0,
+        "secondary_count": 0,
+        "mappings": []
+      },
+      {
+        "control_id": "D001",
+        "control_title": "Prevent hallucinated outputs",
+        "domain": "Reliability",
+        "function_class": "PREV",
+        "mapping_count": 2,
+        "primary_count": 2,
+        "secondary_count": 0,
+        "mappings": [
+          {
+            "owasp_id": "ASI09",
+            "owasp_title": "Human-Agent TrustExploitation",
+            "relevance": "Primary",
+            "rationale_code": "PREV",
+            "rationale_label": "Prevent",
+            "score": 0.79,
+            "signals": {
+              "reference_bridge": 0.5,
+              "semantic": 0.851,
+              "keyword": 0.049
+            }
+          },
+          {
+            "owasp_id": "ASI08",
+            "owasp_title": "Cascading Failures",
+            "relevance": "Primary",
+            "rationale_code": "PREV",
+            "rationale_label": "Prevent",
+            "score": 0.377,
+            "signals": {
+              "reference_bridge": 0.0,
+              "semantic": 0.713,
+              "keyword": 0.069
+            }
+          }
+        ]
+      },
+      {
+        "control_id": "D002",
+        "control_title": "Third-party testing for hallucinations",
+        "domain": "Reliability",
+        "function_class": "VALID",
+        "mapping_count": 2,
+        "primary_count": 1,
+        "secondary_count": 1,
+        "mappings": [
+          {
+            "owasp_id": "ASI09",
+            "owasp_title": "Human-Agent TrustExploitation",
+            "relevance": "Primary",
+            "rationale_code": "VALID",
+            "rationale_label": "Validate and test",
+            "score": 0.613,
+            "signals": {
+              "reference_bridge": 0.25,
+              "semantic": 0.869,
+              "keyword": 0.013
+            }
+          },
+          {
+            "owasp_id": "ASI10",
+            "owasp_title": "Rogue Agents",
+            "relevance": "Secondary",
+            "rationale_code": "VALID",
+            "rationale_label": "Validate and test",
+            "score": 0.531,
             "signals": {
               "reference_bridge": 0.25,
               "semantic": 0.695,
-              "keyword": 0.031
-            },
-            "relationship_type": "Prevents"
+              "keyword": 0.029
+            }
           }
         ]
       },
       {
-        "aiuc_id": "D003",
-        "aiuc_title": "Restrict unsafe tool calls",
-        "aiuc_domain": "Reliability",
+        "control_id": "D003",
+        "control_title": "Restrict unsafe tool calls",
+        "domain": "Reliability",
+        "function_class": "SCOPE",
+        "mapping_count": 5,
+        "primary_count": 5,
+        "secondary_count": 0,
         "mappings": [
           {
             "owasp_id": "ASI02",
             "owasp_title": "Tool Misuse and Exploitation",
-            "score": 0.497,
-            "confidence": "Related",
+            "relevance": "Primary",
+            "rationale_code": "SCOPE",
+            "rationale_label": "Constrain scope",
+            "score": 0.707,
             "signals": {
               "reference_bridge": 0.333,
-              "semantic": 0.909,
-              "keyword": 0.145
-            },
-            "relationship_type": "Prevents"
+              "semantic": 0.862,
+              "keyword": 0.143
+            }
+          },
+          {
+            "owasp_id": "ASI10",
+            "owasp_title": "Rogue Agents",
+            "relevance": "Primary",
+            "rationale_code": "SCOPE",
+            "rationale_label": "Constrain scope",
+            "score": 0.429,
+            "signals": {
+              "reference_bridge": 0.167,
+              "semantic": 0.562,
+              "keyword": 0.106
+            }
+          },
+          {
+            "owasp_id": "ASI08",
+            "owasp_title": "Cascading Failures",
+            "relevance": "Primary",
+            "rationale_code": "SCOPE",
+            "rationale_label": "Constrain scope",
+            "score": 0.423,
+            "signals": {
+              "reference_bridge": 0.2,
+              "semantic": 0.515,
+              "keyword": 0.085
+            }
+          },
+          {
+            "owasp_id": "ASI03",
+            "owasp_title": "Identity and PrivilegeAbuse",
+            "relevance": "Primary",
+            "rationale_code": "SCOPE",
+            "rationale_label": "Constrain scope",
+            "score": 0.4,
+            "signals": {
+              "reference_bridge": 0.2,
+              "semantic": 0.475,
+              "keyword": 0.076
+            }
+          },
+          {
+            "owasp_id": "ASI01",
+            "owasp_title": "Agent Goal Hijack",
+            "relevance": "Primary",
+            "rationale_code": "SCOPE",
+            "rationale_label": "Constrain scope",
+            "score": 0.389,
+            "signals": {
+              "reference_bridge": 0.0,
+              "semantic": 0.703,
+              "keyword": 0.128
+            }
           }
         ]
       },
       {
-        "aiuc_id": "D004",
-        "aiuc_title": "Third-party testing of tool calls",
-        "aiuc_domain": "Reliability",
+        "control_id": "D004",
+        "control_title": "Third-party testing of tool calls",
+        "domain": "Reliability",
+        "function_class": "VALID",
+        "mapping_count": 4,
+        "primary_count": 3,
+        "secondary_count": 1,
         "mappings": [
           {
             "owasp_id": "ASI02",
             "owasp_title": "Tool Misuse and Exploitation",
-            "score": 0.779,
-            "confidence": "Direct",
+            "relevance": "Primary",
+            "rationale_code": "VALID",
+            "rationale_label": "Validate and test",
+            "score": 1.0,
             "signals": {
               "reference_bridge": 1.0,
-              "semantic": 0.879,
-              "keyword": 0.105
-            },
-            "relationship_type": "Prevents"
+              "semantic": 0.844,
+              "keyword": 0.104
+            }
+          },
+          {
+            "owasp_id": "ASI09",
+            "owasp_title": "Human-Agent TrustExploitation",
+            "relevance": "Secondary",
+            "rationale_code": "VALID",
+            "rationale_label": "Validate and test",
+            "score": 0.524,
+            "signals": {
+              "reference_bridge": 0.25,
+              "semantic": 0.686,
+              "keyword": 0.021
+            }
+          },
+          {
+            "owasp_id": "ASI10",
+            "owasp_title": "Rogue Agents",
+            "relevance": "Primary",
+            "rationale_code": "VALID",
+            "rationale_label": "Validate and test",
+            "score": 0.389,
+            "signals": {
+              "reference_bridge": 0.25,
+              "semantic": 0.381,
+              "keyword": 0.079
+            }
+          },
+          {
+            "owasp_id": "ASI05",
+            "owasp_title": "Unexpected CodeExecution (RCE)",
+            "relevance": "Primary",
+            "rationale_code": "VALID",
+            "rationale_label": "Validate and test",
+            "score": 0.362,
+            "signals": {
+              "reference_bridge": 0.0,
+              "semantic": 0.665,
+              "keyword": 0.101
+            }
           }
         ]
       },
       {
-        "aiuc_id": "E001",
-        "aiuc_title": "AI failure plan for security breaches",
-        "aiuc_domain": "Accountability",
+        "control_id": "E001",
+        "control_title": "AI failure plan for security breaches",
+        "domain": "Accountability",
+        "function_class": "GOVERN",
+        "mapping_count": 2,
+        "primary_count": 2,
+        "secondary_count": 0,
+        "mappings": [
+          {
+            "owasp_id": "ASI08",
+            "owasp_title": "Cascading Failures",
+            "relevance": "Primary",
+            "rationale_code": "GOVERN",
+            "rationale_label": "Policy and governance",
+            "score": 0.417,
+            "signals": {
+              "reference_bridge": 0.0,
+              "semantic": 0.807,
+              "keyword": 0.046
+            }
+          },
+          {
+            "owasp_id": "ASI10",
+            "owasp_title": "Rogue Agents",
+            "relevance": "Primary",
+            "rationale_code": "GOVERN",
+            "rationale_label": "Policy and governance",
+            "score": 0.413,
+            "signals": {
+              "reference_bridge": 0.0,
+              "semantic": 0.8,
+              "keyword": 0.044
+            }
+          }
+        ]
+      },
+      {
+        "control_id": "E002",
+        "control_title": "AI failure plan for harmful outputs",
+        "domain": "Accountability",
+        "function_class": "GOVERN",
+        "mapping_count": 2,
+        "primary_count": 2,
+        "secondary_count": 0,
+        "mappings": [
+          {
+            "owasp_id": "ASI10",
+            "owasp_title": "Rogue Agents",
+            "relevance": "Primary",
+            "rationale_code": "GOVERN",
+            "rationale_label": "Policy and governance",
+            "score": 0.372,
+            "signals": {
+              "reference_bridge": 0.0,
+              "semantic": 0.732,
+              "keyword": 0.021
+            }
+          },
+          {
+            "owasp_id": "ASI08",
+            "owasp_title": "Cascading Failures",
+            "relevance": "Primary",
+            "rationale_code": "GOVERN",
+            "rationale_label": "Policy and governance",
+            "score": 0.362,
+            "signals": {
+              "reference_bridge": 0.0,
+              "semantic": 0.683,
+              "keyword": 0.069
+            }
+          }
+        ]
+      },
+      {
+        "control_id": "E003",
+        "control_title": "AI failure plan for hallucinations",
+        "domain": "Accountability",
+        "function_class": "GOVERN",
+        "mapping_count": 2,
+        "primary_count": 2,
+        "secondary_count": 0,
+        "mappings": [
+          {
+            "owasp_id": "ASI08",
+            "owasp_title": "Cascading Failures",
+            "relevance": "Primary",
+            "rationale_code": "GOVERN",
+            "rationale_label": "Policy and governance",
+            "score": 0.456,
+            "signals": {
+              "reference_bridge": 0.0,
+              "semantic": 0.877,
+              "keyword": 0.06
+            }
+          },
+          {
+            "owasp_id": "ASI10",
+            "owasp_title": "Rogue Agents",
+            "relevance": "Primary",
+            "rationale_code": "GOVERN",
+            "rationale_label": "Policy and governance",
+            "score": 0.37,
+            "signals": {
+              "reference_bridge": 0.0,
+              "semantic": 0.728,
+              "keyword": 0.021
+            }
+          }
+        ]
+      },
+      {
+        "control_id": "E004",
+        "control_title": "Assign accountability",
+        "domain": "Accountability",
+        "function_class": "GOVERN",
+        "mapping_count": 0,
+        "primary_count": 0,
+        "secondary_count": 0,
         "mappings": []
       },
       {
-        "aiuc_id": "E002",
-        "aiuc_title": "AI failure plan for harmful outputs",
-        "aiuc_domain": "Accountability",
-        "mappings": []
-      },
-      {
-        "aiuc_id": "E003",
-        "aiuc_title": "AI failure plan for hallucinations",
-        "aiuc_domain": "Accountability",
-        "mappings": []
-      },
-      {
-        "aiuc_id": "E004",
-        "aiuc_title": "Assign accountability",
-        "aiuc_domain": "Accountability",
-        "mappings": []
-      },
-      {
-        "aiuc_id": "E005",
-        "aiuc_title": "Assess cloud vs on-prem processing",
-        "aiuc_domain": "Accountability",
+        "control_id": "E005",
+        "control_title": "Assess cloud vs on-prem processing",
+        "domain": "Accountability",
+        "function_class": "GOVERN",
+        "mapping_count": 1,
+        "primary_count": 0,
+        "secondary_count": 1,
         "mappings": [
           {
             "owasp_id": "ASI04",
             "owasp_title": "Agentic Supply ChainVulnerabilities",
-            "score": 0.661,
-            "confidence": "Direct",
+            "relevance": "Secondary",
+            "rationale_code": "GOVERN",
+            "rationale_label": "Policy and governance",
+            "score": 1.0,
             "signals": {
               "reference_bridge": 1.0,
-              "semantic": 0.598,
+              "semantic": 0.766,
               "keyword": 0.007
-            },
-            "relationship_type": "Prevents"
+            }
           }
         ]
       },
       {
-        "aiuc_id": "E006",
-        "aiuc_title": "Conduct vendor due diligence",
-        "aiuc_domain": "Accountability",
+        "control_id": "E006",
+        "control_title": "Conduct vendor due diligence",
+        "domain": "Accountability",
+        "function_class": "VALID",
+        "mapping_count": 1,
+        "primary_count": 1,
+        "secondary_count": 0,
         "mappings": [
           {
             "owasp_id": "ASI04",
             "owasp_title": "Agentic Supply ChainVulnerabilities",
-            "score": 0.752,
-            "confidence": "Direct",
+            "relevance": "Primary",
+            "rationale_code": "VALID",
+            "rationale_label": "Validate and test",
+            "score": 1.0,
             "signals": {
               "reference_bridge": 1.0,
-              "semantic": 0.837,
-              "keyword": 0.043
-            },
-            "relationship_type": "Prevents"
+              "semantic": 0.842,
+              "keyword": 0.044
+            }
           }
         ]
       },
       {
-        "aiuc_id": "E007",
-        "aiuc_title": "Document system change approvals",
-        "aiuc_domain": "Accountability",
+        "control_id": "E007",
+        "control_title": "Document system change approvals",
+        "domain": "Accountability",
+        "function_class": "GOVERN",
+        "mapping_count": 0,
+        "primary_count": 0,
+        "secondary_count": 0,
         "mappings": []
       },
       {
-        "aiuc_id": "E008",
-        "aiuc_title": "Review internal processes",
-        "aiuc_domain": "Accountability",
+        "control_id": "E008",
+        "control_title": "Review internal processes",
+        "domain": "Accountability",
+        "function_class": "GOVERN",
+        "mapping_count": 0,
+        "primary_count": 0,
+        "secondary_count": 0,
         "mappings": []
       },
       {
-        "aiuc_id": "E009",
-        "aiuc_title": "Monitor third-party access",
-        "aiuc_domain": "Accountability",
+        "control_id": "E009",
+        "control_title": "Monitor third-party access",
+        "domain": "Accountability",
+        "function_class": "DETECT",
+        "mapping_count": 4,
+        "primary_count": 2,
+        "secondary_count": 2,
         "mappings": [
           {
             "owasp_id": "ASI09",
             "owasp_title": "Human-Agent TrustExploitation",
-            "score": 0.386,
-            "confidence": "Related",
+            "relevance": "Secondary",
+            "rationale_code": "DETECT",
+            "rationale_label": "Detect and trace",
+            "score": 0.66,
             "signals": {
               "reference_bridge": 0.333,
-              "semantic": 0.649,
-              "keyword": 0.042
-            },
-            "relationship_type": "Prevents"
+              "semantic": 0.83,
+              "keyword": 0.04
+            }
+          },
+          {
+            "owasp_id": "ASI10",
+            "owasp_title": "Rogue Agents",
+            "relevance": "Secondary",
+            "rationale_code": "DETECT",
+            "rationale_label": "Detect and trace",
+            "score": 0.538,
+            "signals": {
+              "reference_bridge": 0.143,
+              "semantic": 0.842,
+              "keyword": 0.057
+            }
           },
           {
             "owasp_id": "ASI04",
             "owasp_title": "Agentic Supply ChainVulnerabilities",
-            "score": 0.358,
-            "confidence": "Related",
+            "relevance": "Primary",
+            "rationale_code": "DETECT",
+            "rationale_label": "Detect and trace",
+            "score": 0.5,
             "signals": {
               "reference_bridge": 0.25,
-              "semantic": 0.662,
-              "keyword": 0.071
-            },
-            "relationship_type": "Prevents"
+              "semantic": 0.611,
+              "keyword": 0.066
+            }
+          },
+          {
+            "owasp_id": "ASI02",
+            "owasp_title": "Tool Misuse and Exploitation",
+            "relevance": "Primary",
+            "rationale_code": "DETECT",
+            "rationale_label": "Detect and trace",
+            "score": 0.372,
+            "signals": {
+              "reference_bridge": 0.25,
+              "semantic": 0.363,
+              "keyword": 0.051
+            }
           }
         ]
       },
       {
-        "aiuc_id": "E010",
-        "aiuc_title": "Establish AI acceptable use policy",
-        "aiuc_domain": "Accountability",
+        "control_id": "E010",
+        "control_title": "Establish AI acceptable use policy",
+        "domain": "Accountability",
+        "function_class": "GOVERN",
+        "mapping_count": 0,
+        "primary_count": 0,
+        "secondary_count": 0,
         "mappings": []
       },
       {
-        "aiuc_id": "E011",
-        "aiuc_title": "Record processing locations",
-        "aiuc_domain": "Accountability",
+        "control_id": "E011",
+        "control_title": "Record processing locations",
+        "domain": "Accountability",
+        "function_class": "GOVERN",
+        "mapping_count": 0,
+        "primary_count": 0,
+        "secondary_count": 0,
         "mappings": []
       },
       {
-        "aiuc_id": "E012",
-        "aiuc_title": "Document regulatory compliance",
-        "aiuc_domain": "Accountability",
+        "control_id": "E012",
+        "control_title": "Document regulatory compliance",
+        "domain": "Accountability",
+        "function_class": "GOVERN",
+        "mapping_count": 0,
+        "primary_count": 0,
+        "secondary_count": 0,
         "mappings": []
       },
       {
-        "aiuc_id": "E013",
-        "aiuc_title": "Implement quality management system",
-        "aiuc_domain": "Accountability",
+        "control_id": "E013",
+        "control_title": "Implement quality management system",
+        "domain": "Accountability",
+        "function_class": "GOVERN",
+        "mapping_count": 0,
+        "primary_count": 0,
+        "secondary_count": 0,
         "mappings": []
       },
       {
-        "aiuc_id": "E014",
-        "aiuc_title": "Share transparency reports",
-        "aiuc_domain": "Accountability",
+        "control_id": "E014",
+        "control_title": "Share transparency reports",
+        "domain": "Accountability",
+        "function_class": "GOVERN",
+        "mapping_count": 0,
+        "primary_count": 0,
+        "secondary_count": 0,
         "mappings": []
       },
       {
-        "aiuc_id": "E015",
-        "aiuc_title": "Log model activity",
-        "aiuc_domain": "Accountability",
+        "control_id": "E015",
+        "control_title": "Log model activity",
+        "domain": "Accountability",
+        "function_class": "DETECT",
+        "mapping_count": 1,
+        "primary_count": 1,
+        "secondary_count": 0,
+        "mappings": [
+          {
+            "owasp_id": "ASI10",
+            "owasp_title": "Rogue Agents",
+            "relevance": "Primary",
+            "rationale_code": "DETECT",
+            "rationale_label": "Detect and trace",
+            "score": 0.433,
+            "signals": {
+              "reference_bridge": 0.0,
+              "semantic": 0.832,
+              "keyword": 0.057
+            }
+          }
+        ]
+      },
+      {
+        "control_id": "E016",
+        "control_title": "Implement AI disclosure mechanisms",
+        "domain": "Accountability",
+        "function_class": "DISCLOSE",
+        "mapping_count": 1,
+        "primary_count": 1,
+        "secondary_count": 0,
+        "mappings": [
+          {
+            "owasp_id": "ASI09",
+            "owasp_title": "Human-Agent TrustExploitation",
+            "relevance": "Primary",
+            "rationale_code": "DISCLOSE",
+            "rationale_label": "Disclose and calibrate",
+            "score": 0.444,
+            "signals": {
+              "reference_bridge": 0.0,
+              "semantic": 0.844,
+              "keyword": 0.076
+            }
+          }
+        ]
+      },
+      {
+        "control_id": "E017",
+        "control_title": "Document system transparency policy",
+        "domain": "Accountability",
+        "function_class": "DISCLOSE",
+        "mapping_count": 0,
+        "primary_count": 0,
+        "secondary_count": 0,
         "mappings": []
       },
       {
-        "aiuc_id": "E016",
-        "aiuc_title": "Implement AI disclosure mechanisms",
-        "aiuc_domain": "Accountability",
+        "control_id": "F001",
+        "control_title": "Prevent AI cyber misuse",
+        "domain": "Society",
+        "function_class": "PREV",
+        "mapping_count": 0,
+        "primary_count": 0,
+        "secondary_count": 0,
         "mappings": []
       },
       {
-        "aiuc_id": "E017",
-        "aiuc_title": "Document system transparency policy",
-        "aiuc_domain": "Accountability",
-        "mappings": []
-      },
-      {
-        "aiuc_id": "F001",
-        "aiuc_title": "Prevent AI cyber misuse",
-        "aiuc_domain": "Society",
-        "mappings": []
-      },
-      {
-        "aiuc_id": "F002",
-        "aiuc_title": "Prevent catastrophic misuse",
-        "aiuc_domain": "Society",
-        "mappings": []
+        "control_id": "F002",
+        "control_title": "Prevent catastrophic misuse",
+        "domain": "Society",
+        "function_class": "DETECT",
+        "mapping_count": 1,
+        "primary_count": 1,
+        "secondary_count": 0,
+        "mappings": [
+          {
+            "owasp_id": "ASI08",
+            "owasp_title": "Cascading Failures",
+            "relevance": "Primary",
+            "rationale_code": "DETECT",
+            "rationale_label": "Detect and trace",
+            "score": 0.424,
+            "signals": {
+              "reference_bridge": 0.0,
+              "semantic": 0.835,
+              "keyword": 0.025
+            }
+          }
+        ]
       }
     ],
-    "owasp_to_aiuc": [
+    "owasp_to_source": [
       {
         "owasp_id": "ASI01",
         "owasp_title": "Agent Goal Hijack",
         "owasp_rank": 1,
+        "mapping_count": 7,
+        "primary_count": 7,
+        "secondary_count": 0,
+        "function_coverage": {
+          "PREV": 2,
+          "VALID": 1,
+          "GATE": 2,
+          "SCOPE": 2
+        },
+        "uncovered_functions": [
+          "DETECT",
+          "DISCLOSE",
+          "GOVERN",
+          "ISOLATE"
+        ],
         "mappings": [
           {
-            "aiuc_id": "B002",
-            "aiuc_title": "Detect adversarial input",
-            "aiuc_domain": "Security",
-            "score": 0.453,
-            "confidence": "Related",
+            "control_id": "B002",
+            "control_title": "Detect adversarial input",
+            "domain": "Security",
+            "function_class": "PREV",
+            "relevance": "Primary",
+            "rationale_code": "PREV",
+            "rationale_label": "Prevent",
+            "score": 0.638,
             "signals": {
               "reference_bridge": 0.333,
-              "semantic": 0.799,
+              "semantic": 0.739,
               "keyword": 0.117
-            },
-            "relationship_type": "Detects"
+            }
           },
           {
-            "aiuc_id": "B005",
-            "aiuc_title": "Implement real-time input filtering",
-            "aiuc_domain": "Security",
-            "score": 0.42,
-            "confidence": "Related",
+            "control_id": "B005",
+            "control_title": "Implement real-time input filtering",
+            "domain": "Security",
+            "function_class": "PREV",
+            "relevance": "Primary",
+            "rationale_code": "PREV",
+            "rationale_label": "Prevent",
+            "score": 0.618,
             "signals": {
               "reference_bridge": 0.333,
-              "semantic": 0.707,
-              "keyword": 0.112
-            },
-            "relationship_type": "Detects"
+              "semantic": 0.706,
+              "keyword": 0.107
+            }
           },
           {
-            "aiuc_id": "B001",
-            "aiuc_title": "Third-party testing of adversarial robustness",
-            "aiuc_domain": "Security",
-            "score": 0.357,
-            "confidence": "Related",
+            "control_id": "B001",
+            "control_title": "Third-party testing of adversarial robustness",
+            "domain": "Security",
+            "function_class": "VALID",
+            "relevance": "Primary",
+            "rationale_code": "VALID",
+            "rationale_label": "Validate and test",
+            "score": 0.513,
             "signals": {
               "reference_bridge": 0.25,
-              "semantic": 0.664,
+              "semantic": 0.638,
               "keyword": 0.063
-            },
-            "relationship_type": "Prevents"
+            }
+          },
+          {
+            "control_id": "C007",
+            "control_title": "Flag high risk outputs",
+            "domain": "Safety",
+            "function_class": "GATE",
+            "relevance": "Primary",
+            "rationale_code": "GATE",
+            "rationale_label": "Human gate",
+            "score": 0.407,
+            "signals": {
+              "reference_bridge": 0.0,
+              "semantic": 0.783,
+              "keyword": 0.054
+            }
+          },
+          {
+            "control_id": "D003",
+            "control_title": "Restrict unsafe tool calls",
+            "domain": "Reliability",
+            "function_class": "SCOPE",
+            "relevance": "Primary",
+            "rationale_code": "SCOPE",
+            "rationale_label": "Constrain scope",
+            "score": 0.389,
+            "signals": {
+              "reference_bridge": 0.0,
+              "semantic": 0.703,
+              "keyword": 0.128
+            }
+          },
+          {
+            "control_id": "C009",
+            "control_title": "Enable real-time feedback and intervention",
+            "domain": "Safety",
+            "function_class": "GATE",
+            "relevance": "Primary",
+            "rationale_code": "GATE",
+            "rationale_label": "Human gate",
+            "score": 0.383,
+            "signals": {
+              "reference_bridge": 0.0,
+              "semantic": 0.75,
+              "keyword": 0.029
+            }
+          },
+          {
+            "control_id": "B006",
+            "control_title": "Prevent unauthorized AI agent actions",
+            "domain": "Security",
+            "function_class": "SCOPE",
+            "relevance": "Primary",
+            "rationale_code": "SCOPE",
+            "rationale_label": "Constrain scope",
+            "score": 0.364,
+            "signals": {
+              "reference_bridge": 0.0,
+              "semantic": 0.675,
+              "keyword": 0.088
+            }
           }
         ]
       },
@@ -827,58 +1718,111 @@
         "owasp_id": "ASI02",
         "owasp_title": "Tool Misuse and Exploitation",
         "owasp_rank": 2,
+        "mapping_count": 6,
+        "primary_count": 6,
+        "secondary_count": 0,
+        "function_coverage": {
+          "VALID": 1,
+          "SCOPE": 4,
+          "DETECT": 1
+        },
+        "uncovered_functions": [
+          "DISCLOSE",
+          "GATE",
+          "GOVERN",
+          "ISOLATE",
+          "PREV"
+        ],
         "mappings": [
           {
-            "aiuc_id": "D004",
-            "aiuc_title": "Third-party testing of tool calls",
-            "aiuc_domain": "Reliability",
-            "score": 0.779,
-            "confidence": "Direct",
+            "control_id": "D004",
+            "control_title": "Third-party testing of tool calls",
+            "domain": "Reliability",
+            "function_class": "VALID",
+            "relevance": "Primary",
+            "rationale_code": "VALID",
+            "rationale_label": "Validate and test",
+            "score": 1.0,
             "signals": {
               "reference_bridge": 1.0,
-              "semantic": 0.879,
-              "keyword": 0.105
-            },
-            "relationship_type": "Prevents"
+              "semantic": 0.844,
+              "keyword": 0.104
+            }
           },
           {
-            "aiuc_id": "D003",
-            "aiuc_title": "Restrict unsafe tool calls",
-            "aiuc_domain": "Reliability",
-            "score": 0.497,
-            "confidence": "Related",
+            "control_id": "D003",
+            "control_title": "Restrict unsafe tool calls",
+            "domain": "Reliability",
+            "function_class": "SCOPE",
+            "relevance": "Primary",
+            "rationale_code": "SCOPE",
+            "rationale_label": "Constrain scope",
+            "score": 0.707,
             "signals": {
               "reference_bridge": 0.333,
-              "semantic": 0.909,
-              "keyword": 0.145
-            },
-            "relationship_type": "Prevents"
+              "semantic": 0.862,
+              "keyword": 0.143
+            }
           },
           {
-            "aiuc_id": "B007",
-            "aiuc_title": "Enforce user access privileges to AI systems",
-            "aiuc_domain": "Security",
-            "score": 0.399,
-            "confidence": "Related",
+            "control_id": "B007",
+            "control_title": "Enforce user access privileges to AI systems",
+            "domain": "Security",
+            "function_class": "SCOPE",
+            "relevance": "Primary",
+            "rationale_code": "SCOPE",
+            "rationale_label": "Constrain scope",
+            "score": 0.625,
             "signals": {
               "reference_bridge": 0.333,
-              "semantic": 0.667,
-              "keyword": 0.076
-            },
-            "relationship_type": "Prevents"
+              "semantic": 0.739,
+              "keyword": 0.075
+            }
           },
           {
-            "aiuc_id": "A003",
-            "aiuc_title": "Limit AI agent data collection",
-            "aiuc_domain": "Data & Privacy",
-            "score": 0.387,
-            "confidence": "Related",
+            "control_id": "A003",
+            "control_title": "Limit AI agent data collection",
+            "domain": "Data & Privacy",
+            "function_class": "SCOPE",
+            "relevance": "Primary",
+            "rationale_code": "SCOPE",
+            "rationale_label": "Constrain scope",
+            "score": 0.559,
             "signals": {
               "reference_bridge": 0.333,
-              "semantic": 0.639,
-              "keyword": 0.064
-            },
-            "relationship_type": "Prevents"
+              "semantic": 0.612,
+              "keyword": 0.065
+            }
+          },
+          {
+            "control_id": "E009",
+            "control_title": "Monitor third-party access",
+            "domain": "Accountability",
+            "function_class": "DETECT",
+            "relevance": "Primary",
+            "rationale_code": "DETECT",
+            "rationale_label": "Detect and trace",
+            "score": 0.372,
+            "signals": {
+              "reference_bridge": 0.25,
+              "semantic": 0.363,
+              "keyword": 0.051
+            }
+          },
+          {
+            "control_id": "B006",
+            "control_title": "Prevent unauthorized AI agent actions",
+            "domain": "Security",
+            "function_class": "SCOPE",
+            "relevance": "Primary",
+            "rationale_code": "SCOPE",
+            "rationale_label": "Constrain scope",
+            "score": 0.357,
+            "signals": {
+              "reference_bridge": 0.0,
+              "semantic": 0.654,
+              "keyword": 0.099
+            }
           }
         ]
       },
@@ -886,19 +1830,96 @@
         "owasp_id": "ASI03",
         "owasp_title": "Identity and PrivilegeAbuse",
         "owasp_rank": 3,
+        "mapping_count": 5,
+        "primary_count": 4,
+        "secondary_count": 1,
+        "function_coverage": {
+          "SCOPE": 4,
+          "ISOLATE": 1
+        },
+        "uncovered_functions": [
+          "DETECT",
+          "DISCLOSE",
+          "GATE",
+          "GOVERN",
+          "PREV",
+          "VALID"
+        ],
         "mappings": [
           {
-            "aiuc_id": "B007",
-            "aiuc_title": "Enforce user access privileges to AI systems",
-            "aiuc_domain": "Security",
-            "score": 0.484,
-            "confidence": "Related",
+            "control_id": "B007",
+            "control_title": "Enforce user access privileges to AI systems",
+            "domain": "Security",
+            "function_class": "SCOPE",
+            "relevance": "Primary",
+            "rationale_code": "SCOPE",
+            "rationale_label": "Constrain scope",
+            "score": 0.75,
             "signals": {
               "reference_bridge": 0.5,
-              "semantic": 0.685,
-              "keyword": 0.096
-            },
-            "relationship_type": "Prevents"
+              "semantic": 0.743,
+              "keyword": 0.095
+            }
+          },
+          {
+            "control_id": "A003",
+            "control_title": "Limit AI agent data collection",
+            "domain": "Data & Privacy",
+            "function_class": "SCOPE",
+            "relevance": "Secondary",
+            "rationale_code": "SCOPE",
+            "rationale_label": "Constrain scope",
+            "score": 0.569,
+            "signals": {
+              "reference_bridge": 0.2,
+              "semantic": 0.795,
+              "keyword": 0.107
+            }
+          },
+          {
+            "control_id": "D003",
+            "control_title": "Restrict unsafe tool calls",
+            "domain": "Reliability",
+            "function_class": "SCOPE",
+            "relevance": "Primary",
+            "rationale_code": "SCOPE",
+            "rationale_label": "Constrain scope",
+            "score": 0.4,
+            "signals": {
+              "reference_bridge": 0.2,
+              "semantic": 0.475,
+              "keyword": 0.076
+            }
+          },
+          {
+            "control_id": "B006",
+            "control_title": "Prevent unauthorized AI agent actions",
+            "domain": "Security",
+            "function_class": "SCOPE",
+            "relevance": "Primary",
+            "rationale_code": "SCOPE",
+            "rationale_label": "Constrain scope",
+            "score": 0.378,
+            "signals": {
+              "reference_bridge": 0.0,
+              "semantic": 0.687,
+              "keyword": 0.115
+            }
+          },
+          {
+            "control_id": "A005",
+            "control_title": "Prevent cross-customer data exposure",
+            "domain": "Data & Privacy",
+            "function_class": "ISOLATE",
+            "relevance": "Primary",
+            "rationale_code": "ISOLATE",
+            "rationale_label": "Isolate and contain",
+            "score": 0.362,
+            "signals": {
+              "reference_bridge": 0.2,
+              "semantic": 0.399,
+              "keyword": 0.075
+            }
           }
         ]
       },
@@ -906,71 +1927,111 @@
         "owasp_id": "ASI04",
         "owasp_title": "Agentic Supply ChainVulnerabilities",
         "owasp_rank": 4,
+        "mapping_count": 6,
+        "primary_count": 3,
+        "secondary_count": 3,
+        "function_coverage": {
+          "GOVERN": 1,
+          "VALID": 1,
+          "SCOPE": 2,
+          "DETECT": 1,
+          "ISOLATE": 1
+        },
+        "uncovered_functions": [
+          "DISCLOSE",
+          "GATE",
+          "PREV"
+        ],
         "mappings": [
           {
-            "aiuc_id": "E006",
-            "aiuc_title": "Conduct vendor due diligence",
-            "aiuc_domain": "Accountability",
-            "score": 0.752,
-            "confidence": "Direct",
+            "control_id": "E005",
+            "control_title": "Assess cloud vs on-prem processing",
+            "domain": "Accountability",
+            "function_class": "GOVERN",
+            "relevance": "Secondary",
+            "rationale_code": "GOVERN",
+            "rationale_label": "Policy and governance",
+            "score": 1.0,
             "signals": {
               "reference_bridge": 1.0,
-              "semantic": 0.837,
-              "keyword": 0.043
-            },
-            "relationship_type": "Prevents"
-          },
-          {
-            "aiuc_id": "E005",
-            "aiuc_title": "Assess cloud vs on-prem processing",
-            "aiuc_domain": "Accountability",
-            "score": 0.661,
-            "confidence": "Direct",
-            "signals": {
-              "reference_bridge": 1.0,
-              "semantic": 0.598,
+              "semantic": 0.766,
               "keyword": 0.007
-            },
-            "relationship_type": "Prevents"
+            }
           },
           {
-            "aiuc_id": "A007",
-            "aiuc_title": "Prevent IP violations",
-            "aiuc_domain": "Data & Privacy",
-            "score": 0.461,
-            "confidence": "Related",
+            "control_id": "E006",
+            "control_title": "Conduct vendor due diligence",
+            "domain": "Accountability",
+            "function_class": "VALID",
+            "relevance": "Primary",
+            "rationale_code": "VALID",
+            "rationale_label": "Validate and test",
+            "score": 1.0,
+            "signals": {
+              "reference_bridge": 1.0,
+              "semantic": 0.842,
+              "keyword": 0.044
+            }
+          },
+          {
+            "control_id": "A007",
+            "control_title": "Prevent IP violations",
+            "domain": "Data & Privacy",
+            "function_class": "SCOPE",
+            "relevance": "Secondary",
+            "rationale_code": "SCOPE",
+            "rationale_label": "Constrain scope",
+            "score": 0.664,
             "signals": {
               "reference_bridge": 0.5,
-              "semantic": 0.653,
-              "keyword": 0.034
-            },
-            "relationship_type": "Prevents"
+              "semantic": 0.609,
+              "keyword": 0.033
+            }
           },
           {
-            "aiuc_id": "A004",
-            "aiuc_title": "Protect IP & trade secrets",
-            "aiuc_domain": "Data & Privacy",
-            "score": 0.419,
-            "confidence": "Related",
+            "control_id": "A004",
+            "control_title": "Protect IP & trade secrets",
+            "domain": "Data & Privacy",
+            "function_class": "SCOPE",
+            "relevance": "Secondary",
+            "rationale_code": "SCOPE",
+            "rationale_label": "Constrain scope",
+            "score": 0.609,
             "signals": {
               "reference_bridge": 0.333,
-              "semantic": 0.754,
-              "keyword": 0.025
-            },
-            "relationship_type": "Prevents"
+              "semantic": 0.735,
+              "keyword": 0.026
+            }
           },
           {
-            "aiuc_id": "E009",
-            "aiuc_title": "Monitor third-party access",
-            "aiuc_domain": "Accountability",
-            "score": 0.358,
-            "confidence": "Related",
+            "control_id": "E009",
+            "control_title": "Monitor third-party access",
+            "domain": "Accountability",
+            "function_class": "DETECT",
+            "relevance": "Primary",
+            "rationale_code": "DETECT",
+            "rationale_label": "Detect and trace",
+            "score": 0.5,
             "signals": {
               "reference_bridge": 0.25,
-              "semantic": 0.662,
-              "keyword": 0.071
-            },
-            "relationship_type": "Prevents"
+              "semantic": 0.611,
+              "keyword": 0.066
+            }
+          },
+          {
+            "control_id": "B008",
+            "control_title": "Protect model deployment environment",
+            "domain": "Security",
+            "function_class": "ISOLATE",
+            "relevance": "Primary",
+            "rationale_code": "ISOLATE",
+            "rationale_label": "Isolate and contain",
+            "score": 0.42,
+            "signals": {
+              "reference_bridge": 0.0,
+              "semantic": 0.812,
+              "keyword": 0.048
+            }
           }
         ]
       },
@@ -978,97 +2039,111 @@
         "owasp_id": "ASI05",
         "owasp_title": "Unexpected CodeExecution (RCE)",
         "owasp_rank": 5,
+        "mapping_count": 6,
+        "primary_count": 3,
+        "secondary_count": 3,
+        "function_coverage": {
+          "PREV": 3,
+          "VALID": 2,
+          "ISOLATE": 1
+        },
+        "uncovered_functions": [
+          "DETECT",
+          "DISCLOSE",
+          "GATE",
+          "GOVERN",
+          "SCOPE"
+        ],
         "mappings": [
           {
-            "aiuc_id": "C006",
-            "aiuc_title": "Prevent output vulnerabilities",
-            "aiuc_domain": "Safety",
-            "score": 0.57,
-            "confidence": "Direct",
+            "control_id": "C006",
+            "control_title": "Prevent output vulnerabilities",
+            "domain": "Safety",
+            "function_class": "PREV",
+            "relevance": "Primary",
+            "rationale_code": "PREV",
+            "rationale_label": "Prevent",
+            "score": 0.817,
             "signals": {
               "reference_bridge": 0.5,
-              "semantic": 0.909,
-              "keyword": 0.131
-            },
-            "relationship_type": "Prevents"
+              "semantic": 0.851,
+              "keyword": 0.14
+            }
           },
           {
-            "aiuc_id": "B001",
-            "aiuc_title": "Third-party testing of adversarial robustness",
-            "aiuc_domain": "Security",
-            "score": 0.521,
-            "confidence": "Related",
+            "control_id": "B001",
+            "control_title": "Third-party testing of adversarial robustness",
+            "domain": "Security",
+            "function_class": "VALID",
+            "relevance": "Secondary",
+            "rationale_code": "VALID",
+            "rationale_label": "Validate and test",
+            "score": 0.769,
             "signals": {
               "reference_bridge": 0.5,
-              "semantic": 0.811,
+              "semantic": 0.801,
               "keyword": 0.061
-            },
-            "relationship_type": "Prevents"
+            }
           },
           {
-            "aiuc_id": "C004",
-            "aiuc_title": "Prevent out-of-scope outputs",
-            "aiuc_domain": "Safety",
-            "score": 0.458,
-            "confidence": "Related",
+            "control_id": "B002",
+            "control_title": "Detect adversarial input",
+            "domain": "Security",
+            "function_class": "PREV",
+            "relevance": "Secondary",
+            "rationale_code": "PREV",
+            "rationale_label": "Prevent",
+            "score": 0.578,
+            "signals": {
+              "reference_bridge": 0.25,
+              "semantic": 0.734,
+              "keyword": 0.122
+            }
+          },
+          {
+            "control_id": "C004",
+            "control_title": "Prevent out-of-scope outputs",
+            "domain": "Safety",
+            "function_class": "PREV",
+            "relevance": "Secondary",
+            "rationale_code": "PREV",
+            "rationale_label": "Prevent",
+            "score": 0.505,
             "signals": {
               "reference_bridge": 0.5,
-              "semantic": 0.659,
+              "semantic": 0.303,
               "keyword": 0.011
-            },
-            "relationship_type": "Prevents"
+            }
           },
           {
-            "aiuc_id": "B002",
-            "aiuc_title": "Detect adversarial input",
-            "aiuc_domain": "Security",
-            "score": 0.432,
-            "confidence": "Related",
+            "control_id": "A006",
+            "control_title": "Prevent PII leakage",
+            "domain": "Data & Privacy",
+            "function_class": "ISOLATE",
+            "relevance": "Primary",
+            "rationale_code": "ISOLATE",
+            "rationale_label": "Isolate and contain",
+            "score": 0.391,
             "signals": {
               "reference_bridge": 0.25,
-              "semantic": 0.844,
-              "keyword": 0.121
-            },
-            "relationship_type": "Detects"
+              "semantic": 0.402,
+              "keyword": 0.05
+            }
           },
           {
-            "aiuc_id": "B005",
-            "aiuc_title": "Implement real-time input filtering",
-            "aiuc_domain": "Security",
-            "score": 0.431,
-            "confidence": "Related",
+            "control_id": "D004",
+            "control_title": "Third-party testing of tool calls",
+            "domain": "Reliability",
+            "function_class": "VALID",
+            "relevance": "Primary",
+            "rationale_code": "VALID",
+            "rationale_label": "Validate and test",
+            "score": 0.362,
             "signals": {
-              "reference_bridge": 0.25,
-              "semantic": 0.849,
-              "keyword": 0.106
-            },
-            "relationship_type": "Detects"
-          },
-          {
-            "aiuc_id": "B009",
-            "aiuc_title": "Limit output over-exposure",
-            "aiuc_domain": "Security",
-            "score": 0.38,
-            "confidence": "Related",
-            "signals": {
-              "reference_bridge": 0.2,
-              "semantic": 0.822,
-              "keyword": 0.014
-            },
-            "relationship_type": "Prevents"
-          },
-          {
-            "aiuc_id": "C005",
-            "aiuc_title": "Prevent customer-defined high risk outputs",
-            "aiuc_domain": "Safety",
-            "score": 0.371,
-            "confidence": "Related",
-            "signals": {
-              "reference_bridge": 0.5,
-              "semantic": 0.398,
-              "keyword": 0.033
-            },
-            "relationship_type": "Prevents"
+              "reference_bridge": 0.0,
+              "semantic": 0.665,
+              "keyword": 0.101
+            }
           }
         ]
       },
@@ -1076,45 +2151,81 @@
         "owasp_id": "ASI06",
         "owasp_title": "Memory & Context Poisoning",
         "owasp_rank": 6,
+        "mapping_count": 4,
+        "primary_count": 4,
+        "secondary_count": 0,
+        "function_coverage": {
+          "VALID": 1,
+          "ISOLATE": 1,
+          "PREV": 2
+        },
+        "uncovered_functions": [
+          "DETECT",
+          "DISCLOSE",
+          "GATE",
+          "GOVERN",
+          "SCOPE"
+        ],
         "mappings": [
           {
-            "aiuc_id": "B001",
-            "aiuc_title": "Third-party testing of adversarial robustness",
-            "aiuc_domain": "Security",
-            "score": 0.519,
-            "confidence": "Related",
+            "control_id": "B001",
+            "control_title": "Third-party testing of adversarial robustness",
+            "domain": "Security",
+            "function_class": "VALID",
+            "relevance": "Primary",
+            "rationale_code": "VALID",
+            "rationale_label": "Validate and test",
+            "score": 0.767,
             "signals": {
               "reference_bridge": 0.75,
-              "semantic": 0.489,
+              "semantic": 0.45,
               "keyword": 0.054
-            },
-            "relationship_type": "Prevents"
+            }
           },
           {
-            "aiuc_id": "B002",
-            "aiuc_title": "Detect adversarial input",
-            "aiuc_domain": "Security",
-            "score": 0.443,
-            "confidence": "Related",
+            "control_id": "A005",
+            "control_title": "Prevent cross-customer data exposure",
+            "domain": "Data & Privacy",
+            "function_class": "ISOLATE",
+            "relevance": "Primary",
+            "rationale_code": "ISOLATE",
+            "rationale_label": "Isolate and contain",
+            "score": 0.605,
+            "signals": {
+              "reference_bridge": 0.2,
+              "semantic": 0.895,
+              "keyword": 0.061
+            }
+          },
+          {
+            "control_id": "B002",
+            "control_title": "Detect adversarial input",
+            "domain": "Security",
+            "function_class": "PREV",
+            "relevance": "Primary",
+            "rationale_code": "PREV",
+            "rationale_label": "Prevent",
+            "score": 0.57,
             "signals": {
               "reference_bridge": 0.5,
-              "semantic": 0.573,
+              "semantic": 0.386,
               "keyword": 0.09
-            },
-            "relationship_type": "Detects"
+            }
           },
           {
-            "aiuc_id": "B005",
-            "aiuc_title": "Implement real-time input filtering",
-            "aiuc_domain": "Security",
-            "score": 0.417,
-            "confidence": "Related",
+            "control_id": "B005",
+            "control_title": "Implement real-time input filtering",
+            "domain": "Security",
+            "function_class": "PREV",
+            "relevance": "Primary",
+            "rationale_code": "PREV",
+            "rationale_label": "Prevent",
+            "score": 0.455,
             "signals": {
               "reference_bridge": 0.5,
-              "semantic": 0.513,
-              "keyword": 0.065
-            },
-            "relationship_type": "Detects"
+              "semantic": 0.17,
+              "keyword": 0.064
+            }
           }
         ]
       },
@@ -1122,25 +2233,178 @@
         "owasp_id": "ASI07",
         "owasp_title": "Insecure Inter-AgentCommunication",
         "owasp_rank": 7,
-        "mappings": []
+        "mapping_count": 2,
+        "primary_count": 2,
+        "secondary_count": 0,
+        "function_coverage": {
+          "ISOLATE": 2
+        },
+        "uncovered_functions": [
+          "DETECT",
+          "DISCLOSE",
+          "GATE",
+          "GOVERN",
+          "PREV",
+          "SCOPE",
+          "VALID"
+        ],
+        "mappings": [
+          {
+            "control_id": "A006",
+            "control_title": "Prevent PII leakage",
+            "domain": "Data & Privacy",
+            "function_class": "ISOLATE",
+            "relevance": "Primary",
+            "rationale_code": "ISOLATE",
+            "rationale_label": "Isolate and contain",
+            "score": 0.405,
+            "signals": {
+              "reference_bridge": 0.0,
+              "semantic": 0.758,
+              "keyword": 0.087
+            }
+          },
+          {
+            "control_id": "B008",
+            "control_title": "Protect model deployment environment",
+            "domain": "Security",
+            "function_class": "ISOLATE",
+            "relevance": "Primary",
+            "rationale_code": "ISOLATE",
+            "rationale_label": "Isolate and contain",
+            "score": 0.381,
+            "signals": {
+              "reference_bridge": 0.0,
+              "semantic": 0.7,
+              "keyword": 0.104
+            }
+          }
+        ]
       },
       {
         "owasp_id": "ASI08",
         "owasp_title": "Cascading Failures",
         "owasp_rank": 8,
+        "mapping_count": 7,
+        "primary_count": 6,
+        "secondary_count": 1,
+        "function_coverage": {
+          "PREV": 2,
+          "GOVERN": 3,
+          "DETECT": 1,
+          "SCOPE": 1
+        },
+        "uncovered_functions": [
+          "DISCLOSE",
+          "GATE",
+          "ISOLATE",
+          "VALID"
+        ],
         "mappings": [
           {
-            "aiuc_id": "B005",
-            "aiuc_title": "Implement real-time input filtering",
-            "aiuc_domain": "Security",
-            "score": 0.369,
-            "confidence": "Related",
+            "control_id": "B005",
+            "control_title": "Implement real-time input filtering",
+            "domain": "Security",
+            "function_class": "PREV",
+            "relevance": "Secondary",
+            "rationale_code": "PREV",
+            "rationale_label": "Prevent",
+            "score": 0.66,
             "signals": {
               "reference_bridge": 0.5,
-              "semantic": 0.38,
-              "keyword": 0.057
-            },
-            "relationship_type": "Detects"
+              "semantic": 0.587,
+              "keyword": 0.055
+            }
+          },
+          {
+            "control_id": "E003",
+            "control_title": "AI failure plan for hallucinations",
+            "domain": "Accountability",
+            "function_class": "GOVERN",
+            "relevance": "Primary",
+            "rationale_code": "GOVERN",
+            "rationale_label": "Policy and governance",
+            "score": 0.456,
+            "signals": {
+              "reference_bridge": 0.0,
+              "semantic": 0.877,
+              "keyword": 0.06
+            }
+          },
+          {
+            "control_id": "F002",
+            "control_title": "Prevent catastrophic misuse",
+            "domain": "Society",
+            "function_class": "DETECT",
+            "relevance": "Primary",
+            "rationale_code": "DETECT",
+            "rationale_label": "Detect and trace",
+            "score": 0.424,
+            "signals": {
+              "reference_bridge": 0.0,
+              "semantic": 0.835,
+              "keyword": 0.025
+            }
+          },
+          {
+            "control_id": "D003",
+            "control_title": "Restrict unsafe tool calls",
+            "domain": "Reliability",
+            "function_class": "SCOPE",
+            "relevance": "Primary",
+            "rationale_code": "SCOPE",
+            "rationale_label": "Constrain scope",
+            "score": 0.423,
+            "signals": {
+              "reference_bridge": 0.2,
+              "semantic": 0.515,
+              "keyword": 0.085
+            }
+          },
+          {
+            "control_id": "E001",
+            "control_title": "AI failure plan for security breaches",
+            "domain": "Accountability",
+            "function_class": "GOVERN",
+            "relevance": "Primary",
+            "rationale_code": "GOVERN",
+            "rationale_label": "Policy and governance",
+            "score": 0.417,
+            "signals": {
+              "reference_bridge": 0.0,
+              "semantic": 0.807,
+              "keyword": 0.046
+            }
+          },
+          {
+            "control_id": "D001",
+            "control_title": "Prevent hallucinated outputs",
+            "domain": "Reliability",
+            "function_class": "PREV",
+            "relevance": "Primary",
+            "rationale_code": "PREV",
+            "rationale_label": "Prevent",
+            "score": 0.377,
+            "signals": {
+              "reference_bridge": 0.0,
+              "semantic": 0.713,
+              "keyword": 0.069
+            }
+          },
+          {
+            "control_id": "E002",
+            "control_title": "AI failure plan for harmful outputs",
+            "domain": "Accountability",
+            "function_class": "GOVERN",
+            "relevance": "Primary",
+            "rationale_code": "GOVERN",
+            "rationale_label": "Policy and governance",
+            "score": 0.362,
+            "signals": {
+              "reference_bridge": 0.0,
+              "semantic": 0.683,
+              "keyword": 0.069
+            }
           }
         ]
       },
@@ -1148,110 +2412,261 @@
         "owasp_id": "ASI09",
         "owasp_title": "Human-Agent TrustExploitation",
         "owasp_rank": 9,
+        "mapping_count": 16,
+        "primary_count": 7,
+        "secondary_count": 9,
+        "function_coverage": {
+          "PREV": 5,
+          "DETECT": 1,
+          "VALID": 4,
+          "SCOPE": 3,
+          "GATE": 2,
+          "DISCLOSE": 1
+        },
+        "uncovered_functions": [
+          "GOVERN",
+          "ISOLATE"
+        ],
         "mappings": [
           {
-            "aiuc_id": "C003",
-            "aiuc_title": "Prevent harmful outputs",
-            "aiuc_domain": "Safety",
-            "score": 0.558,
-            "confidence": "Direct",
+            "control_id": "C003",
+            "control_title": "Prevent harmful outputs",
+            "domain": "Safety",
+            "function_class": "PREV",
+            "relevance": "Primary",
+            "rationale_code": "PREV",
+            "rationale_label": "Prevent",
+            "score": 0.814,
             "signals": {
               "reference_bridge": 0.5,
-              "semantic": 0.888,
-              "keyword": 0.113
-            },
-            "relationship_type": "Prevents"
+              "semantic": 0.86,
+              "keyword": 0.112
+            }
           },
           {
-            "aiuc_id": "D001",
-            "aiuc_title": "Prevent hallucinated outputs",
-            "aiuc_domain": "Reliability",
-            "score": 0.5,
-            "confidence": "Related",
+            "control_id": "D001",
+            "control_title": "Prevent hallucinated outputs",
+            "domain": "Reliability",
+            "function_class": "PREV",
+            "relevance": "Primary",
+            "rationale_code": "PREV",
+            "rationale_label": "Prevent",
+            "score": 0.79,
             "signals": {
               "reference_bridge": 0.5,
-              "semantic": 0.759,
-              "keyword": 0.05
-            },
-            "relationship_type": "Prevents"
+              "semantic": 0.851,
+              "keyword": 0.049
+            }
           },
           {
-            "aiuc_id": "D002",
-            "aiuc_title": "Third-party testing for hallucinations",
-            "aiuc_domain": "Reliability",
-            "score": 0.428,
-            "confidence": "Related",
-            "signals": {
-              "reference_bridge": 0.25,
-              "semantic": 0.894,
-              "keyword": 0.013
-            },
-            "relationship_type": "Prevents"
-          },
-          {
-            "aiuc_id": "C005",
-            "aiuc_title": "Prevent customer-defined high risk outputs",
-            "aiuc_domain": "Safety",
-            "score": 0.397,
-            "confidence": "Related",
-            "signals": {
-              "reference_bridge": 0.25,
-              "semantic": 0.791,
-              "keyword": 0.038
-            },
-            "relationship_type": "Prevents"
-          },
-          {
-            "aiuc_id": "E009",
-            "aiuc_title": "Monitor third-party access",
-            "aiuc_domain": "Accountability",
-            "score": 0.386,
-            "confidence": "Related",
+            "control_id": "E009",
+            "control_title": "Monitor third-party access",
+            "domain": "Accountability",
+            "function_class": "DETECT",
+            "relevance": "Secondary",
+            "rationale_code": "DETECT",
+            "rationale_label": "Detect and trace",
+            "score": 0.66,
             "signals": {
               "reference_bridge": 0.333,
-              "semantic": 0.649,
-              "keyword": 0.042
-            },
-            "relationship_type": "Prevents"
+              "semantic": 0.83,
+              "keyword": 0.04
+            }
           },
           {
-            "aiuc_id": "B004",
-            "aiuc_title": "Prevent AI endpoint scraping",
-            "aiuc_domain": "Security",
-            "score": 0.365,
-            "confidence": "Related",
+            "control_id": "D002",
+            "control_title": "Third-party testing for hallucinations",
+            "domain": "Reliability",
+            "function_class": "VALID",
+            "relevance": "Primary",
+            "rationale_code": "VALID",
+            "rationale_label": "Validate and test",
+            "score": 0.613,
+            "signals": {
+              "reference_bridge": 0.25,
+              "semantic": 0.869,
+              "keyword": 0.013
+            }
+          },
+          {
+            "control_id": "C005",
+            "control_title": "Prevent customer-defined high risk outputs",
+            "domain": "Safety",
+            "function_class": "PREV",
+            "relevance": "Secondary",
+            "rationale_code": "PREV",
+            "rationale_label": "Prevent",
+            "score": 0.612,
+            "signals": {
+              "reference_bridge": 0.25,
+              "semantic": 0.852,
+              "keyword": 0.039
+            }
+          },
+          {
+            "control_id": "B004",
+            "control_title": "Prevent AI endpoint scraping",
+            "domain": "Security",
+            "function_class": "PREV",
+            "relevance": "Secondary",
+            "rationale_code": "PREV",
+            "rationale_label": "Prevent",
+            "score": 0.58,
             "signals": {
               "reference_bridge": 0.143,
-              "semantic": 0.828,
-              "keyword": 0.054
-            },
-            "relationship_type": "Prevents"
+              "semantic": 0.931,
+              "keyword": 0.051
+            }
           },
           {
-            "aiuc_id": "A003",
-            "aiuc_title": "Limit AI agent data collection",
-            "aiuc_domain": "Data & Privacy",
-            "score": 0.363,
-            "confidence": "Related",
+            "control_id": "B007",
+            "control_title": "Enforce user access privileges to AI systems",
+            "domain": "Security",
+            "function_class": "SCOPE",
+            "relevance": "Secondary",
+            "rationale_code": "SCOPE",
+            "rationale_label": "Constrain scope",
+            "score": 0.536,
             "signals": {
               "reference_bridge": 0.167,
-              "semantic": 0.782,
+              "semantic": 0.79,
+              "keyword": 0.081
+            }
+          },
+          {
+            "control_id": "A003",
+            "control_title": "Limit AI agent data collection",
+            "domain": "Data & Privacy",
+            "function_class": "SCOPE",
+            "relevance": "Secondary",
+            "rationale_code": "SCOPE",
+            "rationale_label": "Constrain scope",
+            "score": 0.535,
+            "signals": {
+              "reference_bridge": 0.167,
+              "semantic": 0.795,
               "keyword": 0.07
-            },
-            "relationship_type": "Prevents"
+            }
           },
           {
-            "aiuc_id": "B007",
-            "aiuc_title": "Enforce user access privileges to AI systems",
-            "aiuc_domain": "Security",
-            "score": 0.362,
-            "confidence": "Related",
+            "control_id": "B001",
+            "control_title": "Third-party testing of adversarial robustness",
+            "domain": "Security",
+            "function_class": "VALID",
+            "relevance": "Secondary",
+            "rationale_code": "VALID",
+            "rationale_label": "Validate and test",
+            "score": 0.524,
+            "signals": {
+              "reference_bridge": 0.333,
+              "semantic": 0.559,
+              "keyword": 0.036
+            }
+          },
+          {
+            "control_id": "D004",
+            "control_title": "Third-party testing of tool calls",
+            "domain": "Reliability",
+            "function_class": "VALID",
+            "relevance": "Secondary",
+            "rationale_code": "VALID",
+            "rationale_label": "Validate and test",
+            "score": 0.524,
+            "signals": {
+              "reference_bridge": 0.25,
+              "semantic": 0.686,
+              "keyword": 0.021
+            }
+          },
+          {
+            "control_id": "B009",
+            "control_title": "Limit output over-exposure",
+            "domain": "Security",
+            "function_class": "SCOPE",
+            "relevance": "Secondary",
+            "rationale_code": "SCOPE",
+            "rationale_label": "Constrain scope",
+            "score": 0.511,
+            "signals": {
+              "reference_bridge": 0.333,
+              "semantic": 0.54,
+              "keyword": 0.027
+            }
+          },
+          {
+            "control_id": "B002",
+            "control_title": "Detect adversarial input",
+            "domain": "Security",
+            "function_class": "PREV",
+            "relevance": "Secondary",
+            "rationale_code": "PREV",
+            "rationale_label": "Prevent",
+            "score": 0.507,
             "signals": {
               "reference_bridge": 0.167,
-              "semantic": 0.771,
-              "keyword": 0.086
-            },
-            "relationship_type": "Prevents"
+              "semantic": 0.73,
+              "keyword": 0.085
+            }
+          },
+          {
+            "control_id": "C007",
+            "control_title": "Flag high risk outputs",
+            "domain": "Safety",
+            "function_class": "GATE",
+            "relevance": "Primary",
+            "rationale_code": "GATE",
+            "rationale_label": "Human gate",
+            "score": 0.458,
+            "signals": {
+              "reference_bridge": 0.0,
+              "semantic": 0.871,
+              "keyword": 0.076
+            }
+          },
+          {
+            "control_id": "E016",
+            "control_title": "Implement AI disclosure mechanisms",
+            "domain": "Accountability",
+            "function_class": "DISCLOSE",
+            "relevance": "Primary",
+            "rationale_code": "DISCLOSE",
+            "rationale_label": "Disclose and calibrate",
+            "score": 0.444,
+            "signals": {
+              "reference_bridge": 0.0,
+              "semantic": 0.844,
+              "keyword": 0.076
+            }
+          },
+          {
+            "control_id": "C009",
+            "control_title": "Enable real-time feedback and intervention",
+            "domain": "Safety",
+            "function_class": "GATE",
+            "relevance": "Primary",
+            "rationale_code": "GATE",
+            "rationale_label": "Human gate",
+            "score": 0.433,
+            "signals": {
+              "reference_bridge": 0.0,
+              "semantic": 0.846,
+              "keyword": 0.035
+            }
+          },
+          {
+            "control_id": "C010",
+            "control_title": "Third-party testing for harmful outputs",
+            "domain": "Safety",
+            "function_class": "VALID",
+            "relevance": "Primary",
+            "rationale_code": "VALID",
+            "rationale_label": "Validate and test",
+            "score": 0.376,
+            "signals": {
+              "reference_bridge": 0.0,
+              "semantic": 0.739,
+              "keyword": 0.023
+            }
           }
         ]
       },
@@ -1259,2409 +2674,366 @@
         "owasp_id": "ASI10",
         "owasp_title": "Rogue Agents",
         "owasp_rank": 10,
+        "mapping_count": 14,
+        "primary_count": 9,
+        "secondary_count": 5,
+        "function_coverage": {
+          "SCOPE": 3,
+          "PREV": 2,
+          "DETECT": 2,
+          "VALID": 2,
+          "ISOLATE": 2,
+          "GOVERN": 3
+        },
+        "uncovered_functions": [
+          "DISCLOSE",
+          "GATE"
+        ],
         "mappings": [
           {
-            "aiuc_id": "B007",
-            "aiuc_title": "Enforce user access privileges to AI systems",
-            "aiuc_domain": "Security",
-            "score": 0.413,
-            "confidence": "Related",
+            "control_id": "B007",
+            "control_title": "Enforce user access privileges to AI systems",
+            "domain": "Security",
+            "function_class": "SCOPE",
+            "relevance": "Secondary",
+            "rationale_code": "SCOPE",
+            "rationale_label": "Constrain scope",
+            "score": 0.574,
             "signals": {
               "reference_bridge": 0.4,
-              "semantic": 0.631,
-              "keyword": 0.06
-            },
-            "relationship_type": "Prevents"
+              "semantic": 0.553,
+              "keyword": 0.059
+            }
           },
           {
-            "aiuc_id": "B009",
-            "aiuc_title": "Limit output over-exposure",
-            "aiuc_domain": "Security",
-            "score": 0.396,
-            "confidence": "Related",
+            "control_id": "B002",
+            "control_title": "Detect adversarial input",
+            "domain": "Security",
+            "function_class": "PREV",
+            "relevance": "Secondary",
+            "rationale_code": "PREV",
+            "rationale_label": "Prevent",
+            "score": 0.557,
             "signals": {
-              "reference_bridge": 0.333,
-              "semantic": 0.696,
-              "keyword": 0.014
-            },
-            "relationship_type": "Prevents"
+              "reference_bridge": 0.167,
+              "semantic": 0.827,
+              "keyword": 0.089
+            }
           },
           {
-            "aiuc_id": "B003",
-            "aiuc_title": "Manage public release of technical details",
-            "aiuc_domain": "Security",
-            "score": 0.389,
-            "confidence": "Related",
+            "control_id": "E009",
+            "control_title": "Monitor third-party access",
+            "domain": "Accountability",
+            "function_class": "DETECT",
+            "relevance": "Secondary",
+            "rationale_code": "DETECT",
+            "rationale_label": "Detect and trace",
+            "score": 0.538,
             "signals": {
-              "reference_bridge": 0.2,
-              "semantic": 0.815,
-              "keyword": 0.067
-            },
-            "relationship_type": "Prevents"
+              "reference_bridge": 0.143,
+              "semantic": 0.842,
+              "keyword": 0.057
+            }
           },
           {
-            "aiuc_id": "D002",
-            "aiuc_title": "Third-party testing for hallucinations",
-            "aiuc_domain": "Reliability",
-            "score": 0.362,
-            "confidence": "Related",
+            "control_id": "B005",
+            "control_title": "Implement real-time input filtering",
+            "domain": "Security",
+            "function_class": "PREV",
+            "relevance": "Secondary",
+            "rationale_code": "PREV",
+            "rationale_label": "Prevent",
+            "score": 0.533,
+            "signals": {
+              "reference_bridge": 0.167,
+              "semantic": 0.799,
+              "keyword": 0.055
+            }
+          },
+          {
+            "control_id": "D002",
+            "control_title": "Third-party testing for hallucinations",
+            "domain": "Reliability",
+            "function_class": "VALID",
+            "relevance": "Secondary",
+            "rationale_code": "VALID",
+            "rationale_label": "Validate and test",
+            "score": 0.531,
             "signals": {
               "reference_bridge": 0.25,
               "semantic": 0.695,
-              "keyword": 0.031
-            },
-            "relationship_type": "Prevents"
+              "keyword": 0.029
+            }
+          },
+          {
+            "control_id": "A006",
+            "control_title": "Prevent PII leakage",
+            "domain": "Data & Privacy",
+            "function_class": "ISOLATE",
+            "relevance": "Primary",
+            "rationale_code": "ISOLATE",
+            "rationale_label": "Isolate and contain",
+            "score": 0.484,
+            "signals": {
+              "reference_bridge": 0.167,
+              "semantic": 0.708,
+              "keyword": 0.046
+            }
+          },
+          {
+            "control_id": "E015",
+            "control_title": "Log model activity",
+            "domain": "Accountability",
+            "function_class": "DETECT",
+            "relevance": "Primary",
+            "rationale_code": "DETECT",
+            "rationale_label": "Detect and trace",
+            "score": 0.433,
+            "signals": {
+              "reference_bridge": 0.0,
+              "semantic": 0.832,
+              "keyword": 0.057
+            }
+          },
+          {
+            "control_id": "D003",
+            "control_title": "Restrict unsafe tool calls",
+            "domain": "Reliability",
+            "function_class": "SCOPE",
+            "relevance": "Primary",
+            "rationale_code": "SCOPE",
+            "rationale_label": "Constrain scope",
+            "score": 0.429,
+            "signals": {
+              "reference_bridge": 0.167,
+              "semantic": 0.562,
+              "keyword": 0.106
+            }
+          },
+          {
+            "control_id": "E001",
+            "control_title": "AI failure plan for security breaches",
+            "domain": "Accountability",
+            "function_class": "GOVERN",
+            "relevance": "Primary",
+            "rationale_code": "GOVERN",
+            "rationale_label": "Policy and governance",
+            "score": 0.413,
+            "signals": {
+              "reference_bridge": 0.0,
+              "semantic": 0.8,
+              "keyword": 0.044
+            }
+          },
+          {
+            "control_id": "B008",
+            "control_title": "Protect model deployment environment",
+            "domain": "Security",
+            "function_class": "ISOLATE",
+            "relevance": "Primary",
+            "rationale_code": "ISOLATE",
+            "rationale_label": "Isolate and contain",
+            "score": 0.404,
+            "signals": {
+              "reference_bridge": 0.0,
+              "semantic": 0.774,
+              "keyword": 0.059
+            }
+          },
+          {
+            "control_id": "D004",
+            "control_title": "Third-party testing of tool calls",
+            "domain": "Reliability",
+            "function_class": "VALID",
+            "relevance": "Primary",
+            "rationale_code": "VALID",
+            "rationale_label": "Validate and test",
+            "score": 0.389,
+            "signals": {
+              "reference_bridge": 0.25,
+              "semantic": 0.381,
+              "keyword": 0.079
+            }
+          },
+          {
+            "control_id": "E002",
+            "control_title": "AI failure plan for harmful outputs",
+            "domain": "Accountability",
+            "function_class": "GOVERN",
+            "relevance": "Primary",
+            "rationale_code": "GOVERN",
+            "rationale_label": "Policy and governance",
+            "score": 0.372,
+            "signals": {
+              "reference_bridge": 0.0,
+              "semantic": 0.732,
+              "keyword": 0.021
+            }
+          },
+          {
+            "control_id": "B006",
+            "control_title": "Prevent unauthorized AI agent actions",
+            "domain": "Security",
+            "function_class": "SCOPE",
+            "relevance": "Primary",
+            "rationale_code": "SCOPE",
+            "rationale_label": "Constrain scope",
+            "score": 0.37,
+            "signals": {
+              "reference_bridge": 0.0,
+              "semantic": 0.674,
+              "keyword": 0.112
+            }
+          },
+          {
+            "control_id": "E003",
+            "control_title": "AI failure plan for hallucinations",
+            "domain": "Accountability",
+            "function_class": "GOVERN",
+            "relevance": "Primary",
+            "rationale_code": "GOVERN",
+            "rationale_label": "Policy and governance",
+            "score": 0.37,
+            "signals": {
+              "reference_bridge": 0.0,
+              "semantic": 0.728,
+              "keyword": 0.021
+            }
           }
         ]
       }
     ]
   },
-  "sub_activity_level": {
-    "aiuc_to_owasp": [
+  "gap_analysis": {
+    "unmapped_controls": [
       {
-        "activity_id": "A001.1",
-        "parent_control": "A001",
-        "description": "Define and communicate input data usage policies including how customer data is used for inference and model training, establishing data retention periods, and documenting customer data rights.",
-        "mappings": []
+        "control_id": "A001",
+        "control_title": "Establish input data policy",
+        "domain": "Data & Privacy",
+        "function_class": "GOVERN",
+        "gap_reason": "No agentic-security-specific relevance identified"
       },
       {
-        "activity_id": "A001.2",
-        "parent_control": "A001",
-        "description": "Implement technical controls to enforce data retention and deletion policies through automating data deletion based on retention schedules.",
-        "mappings": []
+        "control_id": "A002",
+        "control_title": "Establish output data policy",
+        "domain": "Data & Privacy",
+        "function_class": "GOVERN",
+        "gap_reason": "No agentic-security-specific relevance identified"
       },
       {
-        "activity_id": "A001.3",
-        "parent_control": "A001",
-        "description": "Document processes for handling end-user data subject rights including opt-in/opt-out rights, access, portability, or deletion of input data.",
-        "mappings": []
+        "control_id": "B003",
+        "control_title": "Manage public release of technical details",
+        "domain": "Security",
+        "function_class": "PREV",
+        "gap_reason": "Below mapping threshold for all OWASP entries"
       },
       {
-        "activity_id": "A002.1",
-        "parent_control": "A002",
-        "description": "Establishing output ownership and usage rights policies, specifying customer ownership of AI-generated outputs, defining permitted uses, documenting usage restrictions, and disclosing opt-out and deletion procedures.",
-        "mappings": []
+        "control_id": "C001",
+        "control_title": "Define AI risk taxonomy",
+        "domain": "Safety",
+        "function_class": "GOVERN",
+        "gap_reason": "Below mapping threshold for all OWASP entries"
       },
       {
-        "activity_id": "A003.1",
-        "parent_control": "A003",
-        "description": "Configuring data collection limits to reduce data and privacy exposure, limiting data collection to task-relevant information based on context.",
-        "mappings": [
-          {
-            "owasp_id": "ASI02",
-            "score": 0.427,
-            "confidence": "Related"
-          },
-          {
-            "owasp_id": "ASI09",
-            "score": 0.403,
-            "confidence": "Related"
-          }
-        ]
+        "control_id": "C002",
+        "control_title": "Conduct pre-deployment testing",
+        "domain": "Safety",
+        "function_class": "VALID",
+        "gap_reason": "Below mapping threshold for all OWASP entries"
       },
       {
-        "activity_id": "A003.2",
-        "parent_control": "A003",
-        "description": "Deploying monitoring mechanisms ensuring AI systems only perform necessary inference and logging deviations from defined operational scope.",
-        "mappings": [
-          {
-            "owasp_id": "ASI02",
-            "score": 0.427,
-            "confidence": "Related"
-          },
-          {
-            "owasp_id": "ASI09",
-            "score": 0.383,
-            "confidence": "Related"
-          },
-          {
-            "owasp_id": "ASI03",
-            "score": 0.365,
-            "confidence": "Related"
-          }
-        ]
+        "control_id": "C008",
+        "control_title": "Monitor AI risk categories",
+        "domain": "Safety",
+        "function_class": "DETECT",
+        "gap_reason": "Below mapping threshold for all OWASP entries"
       },
       {
-        "activity_id": "A003.3",
-        "parent_control": "A003",
-        "description": "Integrating with existing authorization systems to align agent access permissions with organizational policies.",
-        "mappings": [
-          {
-            "owasp_id": "ASI02",
-            "score": 0.427,
-            "confidence": "Related"
-          },
-          {
-            "owasp_id": "ASI09",
-            "score": 0.403,
-            "confidence": "Related"
-          },
-          {
-            "owasp_id": "ASI07",
-            "score": 0.372,
-            "confidence": "Related"
-          },
-          {
-            "owasp_id": "ASI03",
-            "score": 0.365,
-            "confidence": "Related"
-          }
-        ]
+        "control_id": "C011",
+        "control_title": "Third-party testing for out-of-scope outputs",
+        "domain": "Safety",
+        "function_class": "VALID",
+        "gap_reason": "Below mapping threshold for all OWASP entries"
       },
       {
-        "activity_id": "A004.1",
-        "parent_control": "A004",
-        "description": "Providing user guidance on protecting confidential information.",
-        "mappings": [
-          {
-            "owasp_id": "ASI04",
-            "score": 0.439,
-            "confidence": "Related"
-          }
-        ]
+        "control_id": "C012",
+        "control_title": "Third-party testing for customer-defined risk",
+        "domain": "Safety",
+        "function_class": "VALID",
+        "gap_reason": "Below mapping threshold for all OWASP entries"
       },
       {
-        "activity_id": "A004.2",
-        "parent_control": "A004",
-        "description": "Leveraging foundation model provider protections with zero data retention policies.",
-        "mappings": [
-          {
-            "owasp_id": "ASI04",
-            "score": 0.459,
-            "confidence": "Related"
-          }
-        ]
+        "control_id": "E004",
+        "control_title": "Assign accountability",
+        "domain": "Accountability",
+        "function_class": "GOVERN",
+        "gap_reason": "Below mapping threshold for all OWASP entries"
       },
       {
-        "activity_id": "A004.3",
-        "parent_control": "A004",
-        "description": "Implementing technical controls to detect proprietary information in outputs.",
-        "mappings": [
-          {
-            "owasp_id": "ASI04",
-            "score": 0.419,
-            "confidence": "Related"
-          }
-        ]
+        "control_id": "E007",
+        "control_title": "Document system change approvals",
+        "domain": "Accountability",
+        "function_class": "GOVERN",
+        "gap_reason": "No agentic-security-specific relevance identified"
       },
       {
-        "activity_id": "A004.4",
-        "parent_control": "A004",
-        "description": "Establishing output monitoring for high-risk IP scenarios.",
-        "mappings": [
-          {
-            "owasp_id": "ASI04",
-            "score": 0.419,
-            "confidence": "Related"
-          }
-        ]
+        "control_id": "E008",
+        "control_title": "Review internal processes",
+        "domain": "Accountability",
+        "function_class": "GOVERN",
+        "gap_reason": "No agentic-security-specific relevance identified"
       },
       {
-        "activity_id": "A005.1",
-        "parent_control": "A005",
-        "description": "Establishing explicit consent and disclosure for combined data usage.",
-        "mappings": []
+        "control_id": "E010",
+        "control_title": "Establish AI acceptable use policy",
+        "domain": "Accountability",
+        "function_class": "GOVERN",
+        "gap_reason": "Below mapping threshold for all OWASP entries"
       },
       {
-        "activity_id": "A005.2",
-        "parent_control": "A005",
-        "description": "Implementing customer data isolation controls with strict logical and physical separation.",
-        "mappings": [
-          {
-            "owasp_id": "ASI07",
-            "score": 0.363,
-            "confidence": "Related"
-          },
-          {
-            "owasp_id": "ASI09",
-            "score": 0.357,
-            "confidence": "Related"
-          }
-        ]
+        "control_id": "E011",
+        "control_title": "Record processing locations",
+        "domain": "Accountability",
+        "function_class": "GOVERN",
+        "gap_reason": "No agentic-security-specific relevance identified"
       },
       {
-        "activity_id": "A005.3",
-        "parent_control": "A005",
-        "description": "Implementing privacy-enhancing technologies to reduce competitive exposure.",
-        "mappings": []
+        "control_id": "E012",
+        "control_title": "Document regulatory compliance",
+        "domain": "Accountability",
+        "function_class": "GOVERN",
+        "gap_reason": "No agentic-security-specific relevance identified"
       },
       {
-        "activity_id": "A006.1",
-        "parent_control": "A006",
-        "description": "Implementing safeguards to prevent personal data leakage through AI system outputs and logs, filtering prompts and outputs for personal identifiers.",
-        "mappings": [
-          {
-            "owasp_id": "ASI07",
-            "score": 0.379,
-            "confidence": "Related"
-          }
-        ]
+        "control_id": "E013",
+        "control_title": "Implement quality management system",
+        "domain": "Accountability",
+        "function_class": "GOVERN",
+        "gap_reason": "No agentic-security-specific relevance identified"
       },
       {
-        "activity_id": "A006.2",
-        "parent_control": "A006",
-        "description": "Requiring authentication and authorization for PII access with role-based access controls.",
-        "mappings": [
-          {
-            "owasp_id": "ASI07",
-            "score": 0.359,
-            "confidence": "Related"
-          }
-        ]
+        "control_id": "E014",
+        "control_title": "Share transparency reports",
+        "domain": "Accountability",
+        "function_class": "GOVERN",
+        "gap_reason": "No agentic-security-specific relevance identified"
       },
       {
-        "activity_id": "A006.3",
-        "parent_control": "A006",
-        "description": "Integrating with existing data loss prevention (DLP) systems to monitor and block outputs containing personal data.",
-        "mappings": [
-          {
-            "owasp_id": "ASI07",
-            "score": 0.399,
-            "confidence": "Related"
-          },
-          {
-            "owasp_id": "ASI10",
-            "score": 0.36,
-            "confidence": "Related"
-          }
-        ]
+        "control_id": "E017",
+        "control_title": "Document system transparency policy",
+        "domain": "Accountability",
+        "function_class": "DISCLOSE",
+        "gap_reason": "No agentic-security-specific relevance identified"
       },
       {
-        "activity_id": "A007.1",
-        "parent_control": "A007",
-        "description": "Documenting foundation model provider IP protections including indemnification clauses.",
-        "mappings": [
-          {
-            "owasp_id": "ASI04",
-            "score": 0.501,
-            "confidence": "Related"
-          }
-        ]
-      },
-      {
-        "activity_id": "A007.2",
-        "parent_control": "A007",
-        "description": "Establishing supplementary content filtering mechanisms for IP screening.",
-        "mappings": [
-          {
-            "owasp_id": "ASI04",
-            "score": 0.461,
-            "confidence": "Related"
-          }
-        ]
-      },
-      {
-        "activity_id": "A007.3",
-        "parent_control": "A007",
-        "description": "Implementing user guidance and guardrails to reduce IP risk.",
-        "mappings": [
-          {
-            "owasp_id": "ASI04",
-            "score": 0.461,
-            "confidence": "Related"
-          }
-        ]
-      },
-      {
-        "activity_id": "B001.1",
-        "parent_control": "B001",
-        "description": "Third-party evaluation report demonstrating adversarial robustness testing including risk taxonomy, methodology, findings, and remediation timelines.",
-        "mappings": [
-          {
-            "owasp_id": "ASI05",
-            "score": 0.561,
-            "confidence": "Direct"
-          },
-          {
-            "owasp_id": "ASI06",
-            "score": 0.539,
-            "confidence": "Related"
-          },
-          {
-            "owasp_id": "ASI01",
-            "score": 0.357,
-            "confidence": "Related"
-          }
-        ]
-      },
-      {
-        "activity_id": "B001.2",
-        "parent_control": "B001",
-        "description": "Penetration test reports incorporating AI-specific test cases, shared threat models, and testing calendars.",
-        "mappings": [
-          {
-            "owasp_id": "ASI06",
-            "score": 0.539,
-            "confidence": "Related"
-          },
-          {
-            "owasp_id": "ASI05",
-            "score": 0.521,
-            "confidence": "Related"
-          },
-          {
-            "owasp_id": "ASI01",
-            "score": 0.357,
-            "confidence": "Related"
-          }
-        ]
-      },
-      {
-        "activity_id": "B002.1",
-        "parent_control": "B002",
-        "description": "Implementing monitoring for prompt injection patterns, jailbreak techniques, adversarial input attempts.",
-        "mappings": [
-          {
-            "owasp_id": "ASI05",
-            "score": 0.492,
-            "confidence": "Related"
-          },
-          {
-            "owasp_id": "ASI06",
-            "score": 0.483,
-            "confidence": "Related"
-          },
-          {
-            "owasp_id": "ASI01",
-            "score": 0.453,
-            "confidence": "Related"
-          }
-        ]
-      },
-      {
-        "activity_id": "B002.2",
-        "parent_control": "B002",
-        "description": "Logging suspected adversarial attacks with relevant context and escalating based on severity.",
-        "mappings": [
-          {
-            "owasp_id": "ASI05",
-            "score": 0.512,
-            "confidence": "Related"
-          },
-          {
-            "owasp_id": "ASI06",
-            "score": 0.503,
-            "confidence": "Related"
-          },
-          {
-            "owasp_id": "ASI01",
-            "score": 0.493,
-            "confidence": "Related"
-          }
-        ]
-      },
-      {
-        "activity_id": "B002.3",
-        "parent_control": "B002",
-        "description": "Updating detection rules based on emerging adversarial techniques quarterly.",
-        "mappings": [
-          {
-            "owasp_id": "ASI01",
-            "score": 0.493,
-            "confidence": "Related"
-          },
-          {
-            "owasp_id": "ASI05",
-            "score": 0.472,
-            "confidence": "Related"
-          },
-          {
-            "owasp_id": "ASI06",
-            "score": 0.463,
-            "confidence": "Related"
-          }
-        ]
-      },
-      {
-        "activity_id": "B002.4",
-        "parent_control": "B002",
-        "description": "Implementing adversarial input detection prior to AI model processing.",
-        "mappings": [
-          {
-            "owasp_id": "ASI01",
-            "score": 0.493,
-            "confidence": "Related"
-          },
-          {
-            "owasp_id": "ASI06",
-            "score": 0.483,
-            "confidence": "Related"
-          },
-          {
-            "owasp_id": "ASI05",
-            "score": 0.472,
-            "confidence": "Related"
-          }
-        ]
-      },
-      {
-        "activity_id": "B002.5",
-        "parent_control": "B002",
-        "description": "Integrating adversarial input detection into existing security operations tooling.",
-        "mappings": [
-          {
-            "owasp_id": "ASI05",
-            "score": 0.492,
-            "confidence": "Related"
-          },
-          {
-            "owasp_id": "ASI06",
-            "score": 0.463,
-            "confidence": "Related"
-          },
-          {
-            "owasp_id": "ASI01",
-            "score": 0.453,
-            "confidence": "Related"
-          }
-        ]
-      },
-      {
-        "activity_id": "B003.1",
-        "parent_control": "B003",
-        "description": "Policy document defining limitations and approval requirements for publicly sharing AI system technical details.",
-        "mappings": [
-          {
-            "owasp_id": "ASI10",
-            "score": 0.409,
-            "confidence": "Related"
-          }
-        ]
-      },
-      {
-        "activity_id": "B003.2",
-        "parent_control": "B003",
-        "description": "Approval records for public AI communications.",
-        "mappings": [
-          {
-            "owasp_id": "ASI10",
-            "score": 0.409,
-            "confidence": "Related"
-          }
-        ]
-      },
-      {
-        "activity_id": "B004.1",
-        "parent_control": "B004",
-        "description": "Implementing systems distinguishing between high-volume legitimate usage and adversarial behavior.",
-        "mappings": [
-          {
-            "owasp_id": "ASI09",
-            "score": 0.385,
-            "confidence": "Related"
-          }
-        ]
-      },
-      {
-        "activity_id": "B004.2",
-        "parent_control": "B004",
-        "description": "Implementing rate limiting and query restrictions.",
-        "mappings": [
-          {
-            "owasp_id": "ASI09",
-            "score": 0.365,
-            "confidence": "Related"
-          }
-        ]
-      },
-      {
-        "activity_id": "B004.3",
-        "parent_control": "B004",
-        "description": "Conducting simulated external attack testing of AI endpoints.",
-        "mappings": [
-          {
-            "owasp_id": "ASI09",
-            "score": 0.385,
-            "confidence": "Related"
-          }
-        ]
-      },
-      {
-        "activity_id": "B004.4",
-        "parent_control": "B004",
-        "description": "Tracking identified vulnerabilities and implementing protective measures.",
-        "mappings": [
-          {
-            "owasp_id": "ASI09",
-            "score": 0.365,
-            "confidence": "Related"
-          }
-        ]
-      },
-      {
-        "activity_id": "B005.1",
-        "parent_control": "B005",
-        "description": "Integration of automated moderation tools to filter inputs before reaching the foundation model.",
-        "mappings": [
-          {
-            "owasp_id": "ASI05",
-            "score": 0.451,
-            "confidence": "Related"
-          },
-          {
-            "owasp_id": "ASI01",
-            "score": 0.44,
-            "confidence": "Related"
-          },
-          {
-            "owasp_id": "ASI06",
-            "score": 0.417,
-            "confidence": "Related"
-          },
-          {
-            "owasp_id": "ASI08",
-            "score": 0.389,
-            "confidence": "Related"
-          }
-        ]
-      },
-      {
-        "activity_id": "B005.2",
-        "parent_control": "B005",
-        "description": "Documentation explaining moderation approach including tool selection rationale and threshold settings.",
-        "mappings": [
-          {
-            "owasp_id": "ASI05",
-            "score": 0.451,
-            "confidence": "Related"
-          },
-          {
-            "owasp_id": "ASI01",
-            "score": 0.44,
-            "confidence": "Related"
-          },
-          {
-            "owasp_id": "ASI06",
-            "score": 0.437,
-            "confidence": "Related"
-          },
-          {
-            "owasp_id": "ASI08",
-            "score": 0.389,
-            "confidence": "Related"
-          }
-        ]
-      },
-      {
-        "activity_id": "B005.3",
-        "parent_control": "B005",
-        "description": "User-facing communication when inputs are blocked.",
-        "mappings": [
-          {
-            "owasp_id": "ASI01",
-            "score": 0.46,
-            "confidence": "Related"
-          },
-          {
-            "owasp_id": "ASI05",
-            "score": 0.431,
-            "confidence": "Related"
-          },
-          {
-            "owasp_id": "ASI06",
-            "score": 0.417,
-            "confidence": "Related"
-          },
-          {
-            "owasp_id": "ASI08",
-            "score": 0.409,
-            "confidence": "Related"
-          }
-        ]
-      },
-      {
-        "activity_id": "B005.4",
-        "parent_control": "B005",
-        "description": "Logging system capturing flagged inputs with metadata tracking.",
-        "mappings": [
-          {
-            "owasp_id": "ASI05",
-            "score": 0.451,
-            "confidence": "Related"
-          },
-          {
-            "owasp_id": "ASI01",
-            "score": 0.44,
-            "confidence": "Related"
-          },
-          {
-            "owasp_id": "ASI06",
-            "score": 0.437,
-            "confidence": "Related"
-          },
-          {
-            "owasp_id": "ASI08",
-            "score": 0.429,
-            "confidence": "Related"
-          }
-        ]
-      },
-      {
-        "activity_id": "B005.5",
-        "parent_control": "B005",
-        "description": "Analysis of filter performance metrics with documented threshold adjustments.",
-        "mappings": [
-          {
-            "owasp_id": "ASI05",
-            "score": 0.451,
-            "confidence": "Related"
-          },
-          {
-            "owasp_id": "ASI06",
-            "score": 0.437,
-            "confidence": "Related"
-          },
-          {
-            "owasp_id": "ASI01",
-            "score": 0.42,
-            "confidence": "Related"
-          },
-          {
-            "owasp_id": "ASI08",
-            "score": 0.389,
-            "confidence": "Related"
-          }
-        ]
-      },
-      {
-        "activity_id": "B006.1",
-        "parent_control": "B006",
-        "description": "Restricting agent access to approved backend services and APIs, enforcing network segmentation or API gateway rules.",
-        "mappings": []
-      },
-      {
-        "activity_id": "B006.2",
-        "parent_control": "B006",
-        "description": "Deploying monitoring and alerting for agent actions that exceed security boundaries.",
-        "mappings": []
-      },
-      {
-        "activity_id": "B007.1",
-        "parent_control": "B007",
-        "description": "System-level access controls tailored to AI systems using role-based or attribute-based access.",
-        "mappings": [
-          {
-            "owasp_id": "ASI03",
-            "score": 0.544,
-            "confidence": "Related"
-          },
-          {
-            "owasp_id": "ASI10",
-            "score": 0.433,
-            "confidence": "Related"
-          },
-          {
-            "owasp_id": "ASI02",
-            "score": 0.419,
-            "confidence": "Related"
-          },
-          {
-            "owasp_id": "ASI09",
-            "score": 0.382,
-            "confidence": "Related"
-          }
-        ]
-      },
-      {
-        "activity_id": "B007.2",
-        "parent_control": "B007",
-        "description": "Conducting access reviews and updates at least quarterly.",
-        "mappings": [
-          {
-            "owasp_id": "ASI03",
-            "score": 0.524,
-            "confidence": "Related"
-          },
-          {
-            "owasp_id": "ASI10",
-            "score": 0.413,
-            "confidence": "Related"
-          },
-          {
-            "owasp_id": "ASI02",
-            "score": 0.399,
-            "confidence": "Related"
-          },
-          {
-            "owasp_id": "ASI09",
-            "score": 0.362,
-            "confidence": "Related"
-          }
-        ]
-      },
-      {
-        "activity_id": "B008.1",
-        "parent_control": "B008",
-        "description": "Restricting access to production AI models based on job function.",
-        "mappings": [
-          {
-            "owasp_id": "ASI04",
-            "score": 0.37,
-            "confidence": "Related"
-          }
-        ]
-      },
-      {
-        "activity_id": "B008.2",
-        "parent_control": "B008",
-        "description": "Applying scoped API tokens, TLS for all endpoint traffic, schema validation.",
-        "mappings": []
-      },
-      {
-        "activity_id": "B008.3",
-        "parent_control": "B008",
-        "description": "Securing model hosting environments with minimal container images.",
-        "mappings": [
-          {
-            "owasp_id": "ASI04",
-            "score": 0.35,
-            "confidence": "Related"
-          }
-        ]
-      },
-      {
-        "activity_id": "B008.4",
-        "parent_control": "B008",
-        "description": "Verifying model integrity before deployment using cryptographic checksums.",
-        "mappings": []
-      },
-      {
-        "activity_id": "B009.1",
-        "parent_control": "B009",
-        "description": "Reducing or limiting the number of results shown in outputs to relevant only.",
-        "mappings": [
-          {
-            "owasp_id": "ASI10",
-            "score": 0.396,
-            "confidence": "Related"
-          },
-          {
-            "owasp_id": "ASI05",
-            "score": 0.38,
-            "confidence": "Related"
-          }
-        ]
-      },
-      {
-        "activity_id": "B009.2",
-        "parent_control": "B009",
-        "description": "Providing user-facing notices about output limitations.",
-        "mappings": [
-          {
-            "owasp_id": "ASI05",
-            "score": 0.4,
-            "confidence": "Related"
-          },
-          {
-            "owasp_id": "ASI10",
-            "score": 0.396,
-            "confidence": "Related"
-          }
-        ]
-      },
-      {
-        "activity_id": "B009.3",
-        "parent_control": "B009",
-        "description": "Limiting the fidelity of model outputs with rounding, threshold bands, or obfuscation.",
-        "mappings": [
-          {
-            "owasp_id": "ASI10",
-            "score": 0.416,
-            "confidence": "Related"
-          },
-          {
-            "owasp_id": "ASI05",
-            "score": 0.4,
-            "confidence": "Related"
-          }
-        ]
-      },
-      {
-        "activity_id": "C001.1",
-        "parent_control": "C001",
-        "description": "Internal policy document or risk framework defining AI risk categories with severity levels and examples.",
-        "mappings": [
-          {
-            "owasp_id": "ASI10",
-            "score": 0.404,
-            "confidence": "Related"
-          },
-          {
-            "owasp_id": "ASI09",
-            "score": 0.363,
-            "confidence": "Related"
-          }
-        ]
-      },
-      {
-        "activity_id": "C001.2",
-        "parent_control": "C001",
-        "description": "Quarterly reviews of risk taxonomy with review dates, participants, decisions, and version history.",
-        "mappings": [
-          {
-            "owasp_id": "ASI09",
-            "score": 0.363,
-            "confidence": "Related"
-          }
-        ]
-      },
-      {
-        "activity_id": "C002.1",
-        "parent_control": "C002",
-        "description": "Conducting pre-deployment testing with documented results, risk assessments, and approval sign-offs.",
-        "mappings": []
-      },
-      {
-        "activity_id": "C002.2",
-        "parent_control": "C002",
-        "description": "Integrating AI system testing into established SDLC gates.",
-        "mappings": []
-      },
-      {
-        "activity_id": "C002.3",
-        "parent_control": "C002",
-        "description": "Implementing pre-deployment vulnerability scanning of AI artifacts and dependencies.",
-        "mappings": []
-      },
-      {
-        "activity_id": "C003.1",
-        "parent_control": "C003",
-        "description": "Detecting and blocking harmful output types through content filtering systems.",
-        "mappings": [
-          {
-            "owasp_id": "ASI09",
-            "score": 0.618,
-            "confidence": "Direct"
-          },
-          {
-            "owasp_id": "ASI05",
-            "score": 0.383,
-            "confidence": "Related"
-          },
-          {
-            "owasp_id": "ASI10",
-            "score": 0.355,
-            "confidence": "Related"
-          }
-        ]
-      },
-      {
-        "activity_id": "C003.2",
-        "parent_control": "C003",
-        "description": "Restricting high-risk recommendations in sensitive domains with disclaimers.",
-        "mappings": [
-          {
-            "owasp_id": "ASI09",
-            "score": 0.618,
-            "confidence": "Direct"
-          },
-          {
-            "owasp_id": "ASI10",
-            "score": 0.375,
-            "confidence": "Related"
-          }
-        ]
-      },
-      {
-        "activity_id": "C003.3",
-        "parent_control": "C003",
-        "description": "Monitoring for discriminatory patterns and implementing fairness checks.",
-        "mappings": [
-          {
-            "owasp_id": "ASI09",
-            "score": 0.558,
-            "confidence": "Direct"
-          }
-        ]
-      },
-      {
-        "activity_id": "C003.4",
-        "parent_control": "C003",
-        "description": "Evaluating harm mitigation controls using performance metrics.",
-        "mappings": [
-          {
-            "owasp_id": "ASI09",
-            "score": 0.558,
-            "confidence": "Direct"
-          }
-        ]
-      },
-      {
-        "activity_id": "C004.1",
-        "parent_control": "C004",
-        "description": "Blocking rules, defensive prompting, or filtering for out-of-scope requests.",
-        "mappings": [
-          {
-            "owasp_id": "ASI05",
-            "score": 0.458,
-            "confidence": "Related"
-          }
-        ]
-      },
-      {
-        "activity_id": "C004.2",
-        "parent_control": "C004",
-        "description": "Logs showing out-of-scope attempts with frequency data and boundary updates.",
-        "mappings": [
-          {
-            "owasp_id": "ASI05",
-            "score": 0.478,
-            "confidence": "Related"
-          }
-        ]
-      },
-      {
-        "activity_id": "C004.3",
-        "parent_control": "C004",
-        "description": "User-facing guidance explaining system capabilities and limitations.",
-        "mappings": [
-          {
-            "owasp_id": "ASI05",
-            "score": 0.458,
-            "confidence": "Related"
-          }
-        ]
-      },
-      {
-        "activity_id": "C005.1",
-        "parent_control": "C005",
-        "description": "Implementing detection and blocking mechanisms aligned with organizational risk taxonomy.",
-        "mappings": [
-          {
-            "owasp_id": "ASI09",
-            "score": 0.437,
-            "confidence": "Related"
-          },
-          {
-            "owasp_id": "ASI05",
-            "score": 0.411,
-            "confidence": "Related"
-          },
-          {
-            "owasp_id": "ASI10",
-            "score": 0.353,
-            "confidence": "Related"
-          }
-        ]
-      },
-      {
-        "activity_id": "C005.2",
-        "parent_control": "C005",
-        "description": "Establishing escalation procedures for flagged high-risk content.",
-        "mappings": [
-          {
-            "owasp_id": "ASI09",
-            "score": 0.397,
-            "confidence": "Related"
-          },
-          {
-            "owasp_id": "ASI05",
-            "score": 0.371,
-            "confidence": "Related"
-          }
-        ]
-      },
-      {
-        "activity_id": "C005.3",
-        "parent_control": "C005",
-        "description": "Implementing automated real-time interventions.",
-        "mappings": [
-          {
-            "owasp_id": "ASI09",
-            "score": 0.397,
-            "confidence": "Related"
-          },
-          {
-            "owasp_id": "ASI05",
-            "score": 0.391,
-            "confidence": "Related"
-          }
-        ]
-      },
-      {
-        "activity_id": "C006.1",
-        "parent_control": "C006",
-        "description": "Establishing output sanitization and validation procedures before presenting content to users.",
-        "mappings": [
-          {
-            "owasp_id": "ASI05",
-            "score": 0.59,
-            "confidence": "Direct"
-          }
-        ]
-      },
-      {
-        "activity_id": "C006.2",
-        "parent_control": "C006",
-        "description": "Implementing security labeling and content handling based on trust level.",
-        "mappings": [
-          {
-            "owasp_id": "ASI05",
-            "score": 0.61,
-            "confidence": "Direct"
-          }
-        ]
-      },
-      {
-        "activity_id": "C006.3",
-        "parent_control": "C006",
-        "description": "Detecting advanced output-based attack patterns.",
-        "mappings": [
-          {
-            "owasp_id": "ASI05",
-            "score": 0.57,
-            "confidence": "Direct"
-          }
-        ]
-      },
-      {
-        "activity_id": "C007.1",
-        "parent_control": "C007",
-        "description": "Document or policy defining high-risk outputs requiring human review.",
-        "mappings": []
-      },
-      {
-        "activity_id": "C007.2",
-        "parent_control": "C007",
-        "description": "Detection code, configuration, or rules engine showing high-risk output filtering.",
-        "mappings": []
-      },
-      {
-        "activity_id": "C007.3",
-        "parent_control": "C007",
-        "description": "Workflow documentation for human review process for flagged outputs.",
-        "mappings": []
-      },
-      {
-        "activity_id": "C008.1",
-        "parent_control": "C008",
-        "description": "Establish ongoing monitoring of AI outputs across risk categories through regular evaluations.",
-        "mappings": [
-          {
-            "owasp_id": "ASI09",
-            "score": 0.355,
-            "confidence": "Related"
-          }
-        ]
-      },
-      {
-        "activity_id": "C008.2",
-        "parent_control": "C008",
-        "description": "Maintain documentation recording identified risk scenarios with examples.",
-        "mappings": []
-      },
-      {
-        "activity_id": "C008.4",
-        "parent_control": "C008",
-        "description": "Integrate AI output monitoring with existing security tools.",
-        "mappings": []
-      },
-      {
-        "activity_id": "C009.1",
-        "parent_control": "C009",
-        "description": "Enable user intervention capabilities such as pause, stop, or redirect system behavior.",
-        "mappings": []
-      },
-      {
-        "activity_id": "C009.2",
-        "parent_control": "C009",
-        "description": "Review user feedback and intervention logs regularly.",
-        "mappings": []
-      },
-      {
-        "activity_id": "C010.1",
-        "parent_control": "C010",
-        "description": "Third-party evaluation report showing harmful output testing.",
-        "mappings": []
-      },
-      {
-        "activity_id": "C011.1",
-        "parent_control": "C011",
-        "description": "Third-party evaluation report showing out-of-scope output testing.",
-        "mappings": []
-      },
-      {
-        "activity_id": "C012.1",
-        "parent_control": "C012",
-        "description": "Third-party evaluation report showing testing of customer-defined risk.",
-        "mappings": []
-      },
-      {
-        "activity_id": "D001.1",
-        "parent_control": "D001",
-        "description": "Implementing factual accuracy controls via fact-checking mechanisms, flagging uncertain responses.",
-        "mappings": [
-          {
-            "owasp_id": "ASI09",
-            "score": 0.5,
-            "confidence": "Related"
-          }
-        ]
-      },
-      {
-        "activity_id": "D001.2",
-        "parent_control": "D001",
-        "description": "Requiring citations for factual claims, implementing source reliability checks.",
-        "mappings": [
-          {
-            "owasp_id": "ASI09",
-            "score": 0.5,
-            "confidence": "Related"
-          }
-        ]
-      },
-      {
-        "activity_id": "D001.3",
-        "parent_control": "D001",
-        "description": "Maintaining uncertainty communication through confidence levels and disclaimers.",
-        "mappings": [
-          {
-            "owasp_id": "ASI09",
-            "score": 0.52,
-            "confidence": "Related"
-          }
-        ]
-      },
-      {
-        "activity_id": "D002.1",
-        "parent_control": "D002",
-        "description": "Third-party evaluation report showing hallucination testing results.",
-        "mappings": [
-          {
-            "owasp_id": "ASI09",
-            "score": 0.428,
-            "confidence": "Related"
-          },
-          {
-            "owasp_id": "ASI10",
-            "score": 0.362,
-            "confidence": "Related"
-          }
-        ]
-      },
-      {
-        "activity_id": "D003.1",
-        "parent_control": "D003",
-        "description": "Function call validation and authorization, restricting tool access to approved functions, validating parameters before execution.",
-        "mappings": [
-          {
-            "owasp_id": "ASI02",
-            "score": 0.517,
-            "confidence": "Related"
-          }
-        ]
-      },
-      {
-        "activity_id": "D003.2",
-        "parent_control": "D003",
-        "description": "Enforcing rate limits and transaction caps for autonomous tool use.",
-        "mappings": [
-          {
-            "owasp_id": "ASI02",
-            "score": 0.517,
-            "confidence": "Related"
-          }
-        ]
-      },
-      {
-        "activity_id": "D003.3",
-        "parent_control": "D003",
-        "description": "Execution monitoring and logging; tracking all tool calls, monitoring for unauthorized access attempts.",
-        "mappings": [
-          {
-            "owasp_id": "ASI02",
-            "score": 0.517,
-            "confidence": "Related"
-          }
-        ]
-      },
-      {
-        "activity_id": "D003.4",
-        "parent_control": "D003",
-        "description": "Requiring human approval for sensitive tool operations.",
-        "mappings": [
-          {
-            "owasp_id": "ASI02",
-            "score": 0.517,
-            "confidence": "Related"
-          }
-        ]
-      },
-      {
-        "activity_id": "D003.5",
-        "parent_control": "D003",
-        "description": "Reviewing patterns of AI tool usage; identifying anomalies, updating tool permissions.",
-        "mappings": [
-          {
-            "owasp_id": "ASI02",
-            "score": 0.537,
-            "confidence": "Related"
-          }
-        ]
-      },
-      {
-        "activity_id": "D004.1",
-        "parent_control": "D004",
-        "description": "Third-party evaluation report showing tool call testing results.",
-        "mappings": [
-          {
-            "owasp_id": "ASI02",
-            "score": 0.799,
-            "confidence": "Direct"
-          }
-        ]
-      },
-      {
-        "activity_id": "E001.1",
-        "parent_control": "E001",
-        "description": "Assign breach response lead and document incident response procedures.",
-        "mappings": []
-      },
-      {
-        "activity_id": "E001.2",
-        "parent_control": "E001",
-        "description": "Define procedures for customer communications, regulatory reporting, and vendor notifications.",
-        "mappings": []
-      },
-      {
-        "activity_id": "E001.3",
-        "parent_control": "E001",
-        "description": "Implement system freeze capabilities, vulnerability fixes, access control updates.",
-        "mappings": []
-      },
-      {
-        "activity_id": "E001.4",
-        "parent_control": "E001",
-        "description": "Establish guidance on preserving evidence for legal review.",
-        "mappings": []
-      },
-      {
-        "activity_id": "E002.1",
-        "parent_control": "E002",
-        "description": "Implementing customer communication protocols and immediate mitigation steps.",
-        "mappings": []
-      },
-      {
-        "activity_id": "E002.2",
-        "parent_control": "E002",
-        "description": "Defining harmful output category definitions and external support engagement.",
-        "mappings": []
-      },
-      {
-        "activity_id": "E003.1",
-        "parent_control": "E003",
-        "description": "Establishing compensation assessment procedures and remediation measures.",
-        "mappings": []
-      },
-      {
-        "activity_id": "E003.2",
-        "parent_control": "E003",
-        "description": "Defining hallucination incident types and external support coordination.",
-        "mappings": []
-      },
-      {
-        "activity_id": "E004.1",
-        "parent_control": "E004",
-        "description": "Documentation defining which AI system changes require approval with assigned leads, plus approval records.",
-        "mappings": []
-      },
-      {
-        "activity_id": "E004.2",
-        "parent_control": "E004",
-        "description": "Implementing code signing and verification processes for AI models and deployment artifacts.",
-        "mappings": []
-      },
-      {
-        "activity_id": "E005.1",
-        "parent_control": "E005",
-        "description": "Risk assessment and decision record evaluating cloud vs. on-premises factors.",
-        "mappings": [
-          {
-            "owasp_id": "ASI04",
-            "score": 0.661,
-            "confidence": "Direct"
-          }
-        ]
-      },
-      {
-        "activity_id": "E006.1",
-        "parent_control": "E006",
-        "description": "Vendor assessment records showing evaluation criteria, scoring, verification, and approval decisions.",
-        "mappings": [
-          {
-            "owasp_id": "ASI04",
-            "score": 0.752,
-            "confidence": "Direct"
-          }
-        ]
-      },
-      {
-        "activity_id": "E007.1",
-        "parent_control": "E007",
-        "description": "RETIRED - merged into E004.",
-        "mappings": []
-      },
-      {
-        "activity_id": "E008.1",
-        "parent_control": "E008",
-        "description": "Quarterly reviews of decision processes including AI system changes, foundational model selection.",
-        "mappings": []
-      },
-      {
-        "activity_id": "E008.2",
-        "parent_control": "E008",
-        "description": "Collect and implement external feedback on AI systems.",
-        "mappings": [
-          {
-            "owasp_id": "ASI09",
-            "score": 0.36,
-            "confidence": "Related"
-          }
-        ]
-      },
-      {
-        "activity_id": "E009.1",
-        "parent_control": "E009",
-        "description": "Configuring logging for third-party interactions with captured metadata.",
-        "mappings": [
-          {
-            "owasp_id": "ASI09",
-            "score": 0.406,
-            "confidence": "Related"
-          },
-          {
-            "owasp_id": "ASI04",
-            "score": 0.378,
-            "confidence": "Related"
-          },
-          {
-            "owasp_id": "ASI02",
-            "score": 0.362,
-            "confidence": "Related"
-          }
-        ]
-      },
-      {
-        "activity_id": "E010.1",
-        "parent_control": "E010",
-        "description": "Policy document defining acceptable and prohibited AI usage.",
-        "mappings": []
-      },
-      {
-        "activity_id": "E010.2",
-        "parent_control": "E010",
-        "description": "Implementation of detection and monitoring systems for AUP violations.",
-        "mappings": []
-      },
-      {
-        "activity_id": "E010.3",
-        "parent_control": "E010",
-        "description": "User-facing alerts when acceptable use policy is violated.",
-        "mappings": []
-      },
-      {
-        "activity_id": "E010.4",
-        "parent_control": "E010",
-        "description": "Real-time blocking/alerting capabilities and violation tracking.",
-        "mappings": []
-      },
-      {
-        "activity_id": "E011.1",
-        "parent_control": "E011",
-        "description": "Maintaining AI infrastructure location documentation.",
-        "mappings": []
-      },
-      {
-        "activity_id": "E011.2",
-        "parent_control": "E011",
-        "description": "Implementing transfer compliance procedures.",
-        "mappings": []
-      },
-      {
-        "activity_id": "E012.1",
-        "parent_control": "E012",
-        "description": "Identify applicable regulations, document compliance procedures, and review every 6 months.",
-        "mappings": []
-      },
-      {
-        "activity_id": "E013.1",
-        "parent_control": "E013",
-        "description": "Defining quality objectives, metrics, and risk management approach.",
-        "mappings": []
-      },
-      {
-        "activity_id": "E013.2",
-        "parent_control": "E013",
-        "description": "Establishing change management, approval processes.",
-        "mappings": []
-      },
-      {
-        "activity_id": "E013.3",
-        "parent_control": "E013",
-        "description": "Implementing defect tracking, continuous improvement, and post-market monitoring.",
-        "mappings": []
-      },
-      {
-        "activity_id": "E013.4",
-        "parent_control": "E013",
-        "description": "Establishing data management and record-keeping systems.",
-        "mappings": []
-      },
-      {
-        "activity_id": "E013.5",
-        "parent_control": "E013",
-        "description": "Documenting communication procedures with regulatory authorities.",
-        "mappings": []
-      },
-      {
-        "activity_id": "E014.1",
-        "parent_control": "E014",
-        "description": "RETIRED - merged into E017.",
-        "mappings": []
-      },
-      {
-        "activity_id": "E015.1",
-        "parent_control": "E015",
-        "description": "Capture system activity details including inputs, processing steps, outputs, and metadata.",
-        "mappings": []
-      },
-      {
-        "activity_id": "E015.2",
-        "parent_control": "E015",
-        "description": "Implement storage with retention policies, access controls, and data sanitation.",
-        "mappings": []
-      },
-      {
-        "activity_id": "E015.3",
-        "parent_control": "E015",
-        "description": "Ensure logs are tamper-evident and independently verifiable.",
-        "mappings": []
-      },
-      {
-        "activity_id": "E016.1",
-        "parent_control": "E016",
-        "description": "Display clear notices when users interact with AI chatbots.",
-        "mappings": []
-      },
-      {
-        "activity_id": "E016.2",
-        "parent_control": "E016",
-        "description": "Provide audio notifications at the beginning of voice calls.",
-        "mappings": []
-      },
-      {
-        "activity_id": "E016.3",
-        "parent_control": "E016",
-        "description": "Mark AI-generated content with metadata, watermarks, or labels.",
-        "mappings": []
-      },
-      {
-        "activity_id": "E016.4",
-        "parent_control": "E016",
-        "description": "Notify users when autonomous AI agents perform actions.",
-        "mappings": [
-          {
-            "owasp_id": "ASI09",
-            "score": 0.362,
-            "confidence": "Related"
-          },
-          {
-            "owasp_id": "ASI01",
-            "score": 0.351,
-            "confidence": "Related"
-          }
-        ]
-      },
-      {
-        "activity_id": "E016.5",
-        "parent_control": "E016",
-        "description": "Systems respond to user questions about whether they are interacting with AI.",
-        "mappings": [
-          {
-            "owasp_id": "ASI01",
-            "score": 0.351,
-            "confidence": "Related"
-          }
-        ]
-      },
-      {
-        "activity_id": "E017.1",
-        "parent_control": "E017",
-        "description": "Policy document defining transparency documentation requirements.",
-        "mappings": []
-      },
-      {
-        "activity_id": "E017.2",
-        "parent_control": "E017",
-        "description": "Transparency documentation artifacts: model cards, datasheets, interpretability reports, AI Bill of Materials.",
-        "mappings": []
-      },
-      {
-        "activity_id": "E017.3",
-        "parent_control": "E017",
-        "description": "Policy defining transparency sharing practices with stakeholder categories.",
-        "mappings": []
-      },
-      {
-        "activity_id": "F001.1",
-        "parent_control": "F001",
-        "description": "Provider model cards and documentation describing offensive cyber capabilities and mitigation strategies.",
-        "mappings": []
-      },
-      {
-        "activity_id": "F001.2",
-        "parent_control": "F001",
-        "description": "Deploy content filtering to detect requests for malicious code generation and vulnerability exploitation.",
-        "mappings": []
-      },
-      {
-        "activity_id": "F002.1",
-        "parent_control": "F002",
-        "description": "List of foundation models with CBRN capability information and risk evaluations.",
-        "mappings": []
-      },
-      {
-        "activity_id": "F002.2",
-        "parent_control": "F002",
-        "description": "Monitoring dashboard or alert configuration for catastrophic misuse patterns.",
-        "mappings": []
+        "control_id": "F001",
+        "control_title": "Prevent AI cyber misuse",
+        "domain": "Society",
+        "function_class": "PREV",
+        "gap_reason": "Below mapping threshold for all OWASP entries"
       }
     ],
-    "owasp_to_aiuc": [
-      {
-        "owasp_id": "ASI01",
-        "owasp_title": "Agent Goal Hijack",
-        "mappings": [
-          {
-            "activity_id": "B002.2",
-            "parent_control": "B002",
-            "score": 0.493,
-            "confidence": "Related"
-          },
-          {
-            "activity_id": "B002.3",
-            "parent_control": "B002",
-            "score": 0.493,
-            "confidence": "Related"
-          },
-          {
-            "activity_id": "B002.4",
-            "parent_control": "B002",
-            "score": 0.493,
-            "confidence": "Related"
-          },
-          {
-            "activity_id": "B005.3",
-            "parent_control": "B005",
-            "score": 0.46,
-            "confidence": "Related"
-          },
-          {
-            "activity_id": "B002.1",
-            "parent_control": "B002",
-            "score": 0.453,
-            "confidence": "Related"
-          },
-          {
-            "activity_id": "B002.5",
-            "parent_control": "B002",
-            "score": 0.453,
-            "confidence": "Related"
-          },
-          {
-            "activity_id": "B005.1",
-            "parent_control": "B005",
-            "score": 0.44,
-            "confidence": "Related"
-          },
-          {
-            "activity_id": "B005.2",
-            "parent_control": "B005",
-            "score": 0.44,
-            "confidence": "Related"
-          },
-          {
-            "activity_id": "B005.4",
-            "parent_control": "B005",
-            "score": 0.44,
-            "confidence": "Related"
-          },
-          {
-            "activity_id": "B005.5",
-            "parent_control": "B005",
-            "score": 0.42,
-            "confidence": "Related"
-          },
-          {
-            "activity_id": "B001.1",
-            "parent_control": "B001",
-            "score": 0.357,
-            "confidence": "Related"
-          },
-          {
-            "activity_id": "B001.2",
-            "parent_control": "B001",
-            "score": 0.357,
-            "confidence": "Related"
-          },
-          {
-            "activity_id": "E016.4",
-            "parent_control": "E016",
-            "score": 0.351,
-            "confidence": "Related"
-          },
-          {
-            "activity_id": "E016.5",
-            "parent_control": "E016",
-            "score": 0.351,
-            "confidence": "Related"
-          }
-        ]
-      },
-      {
-        "owasp_id": "ASI02",
-        "owasp_title": "Tool Misuse and Exploitation",
-        "mappings": [
-          {
-            "activity_id": "D004.1",
-            "parent_control": "D004",
-            "score": 0.799,
-            "confidence": "Direct"
-          },
-          {
-            "activity_id": "D003.5",
-            "parent_control": "D003",
-            "score": 0.537,
-            "confidence": "Related"
-          },
-          {
-            "activity_id": "D003.1",
-            "parent_control": "D003",
-            "score": 0.517,
-            "confidence": "Related"
-          },
-          {
-            "activity_id": "D003.2",
-            "parent_control": "D003",
-            "score": 0.517,
-            "confidence": "Related"
-          },
-          {
-            "activity_id": "D003.3",
-            "parent_control": "D003",
-            "score": 0.517,
-            "confidence": "Related"
-          },
-          {
-            "activity_id": "D003.4",
-            "parent_control": "D003",
-            "score": 0.517,
-            "confidence": "Related"
-          },
-          {
-            "activity_id": "A003.1",
-            "parent_control": "A003",
-            "score": 0.427,
-            "confidence": "Related"
-          },
-          {
-            "activity_id": "A003.2",
-            "parent_control": "A003",
-            "score": 0.427,
-            "confidence": "Related"
-          },
-          {
-            "activity_id": "A003.3",
-            "parent_control": "A003",
-            "score": 0.427,
-            "confidence": "Related"
-          },
-          {
-            "activity_id": "B007.1",
-            "parent_control": "B007",
-            "score": 0.419,
-            "confidence": "Related"
-          },
-          {
-            "activity_id": "B007.2",
-            "parent_control": "B007",
-            "score": 0.399,
-            "confidence": "Related"
-          },
-          {
-            "activity_id": "E009.1",
-            "parent_control": "E009",
-            "score": 0.362,
-            "confidence": "Related"
-          }
-        ]
-      },
-      {
-        "owasp_id": "ASI03",
-        "owasp_title": "Identity and PrivilegeAbuse",
-        "mappings": [
-          {
-            "activity_id": "B007.1",
-            "parent_control": "B007",
-            "score": 0.544,
-            "confidence": "Related"
-          },
-          {
-            "activity_id": "B007.2",
-            "parent_control": "B007",
-            "score": 0.524,
-            "confidence": "Related"
-          },
-          {
-            "activity_id": "A003.2",
-            "parent_control": "A003",
-            "score": 0.365,
-            "confidence": "Related"
-          },
-          {
-            "activity_id": "A003.3",
-            "parent_control": "A003",
-            "score": 0.365,
-            "confidence": "Related"
-          }
-        ]
-      },
-      {
-        "owasp_id": "ASI04",
-        "owasp_title": "Agentic Supply ChainVulnerabilities",
-        "mappings": [
-          {
-            "activity_id": "E006.1",
-            "parent_control": "E006",
-            "score": 0.752,
-            "confidence": "Direct"
-          },
-          {
-            "activity_id": "E005.1",
-            "parent_control": "E005",
-            "score": 0.661,
-            "confidence": "Direct"
-          },
-          {
-            "activity_id": "A007.1",
-            "parent_control": "A007",
-            "score": 0.501,
-            "confidence": "Related"
-          },
-          {
-            "activity_id": "A007.2",
-            "parent_control": "A007",
-            "score": 0.461,
-            "confidence": "Related"
-          },
-          {
-            "activity_id": "A007.3",
-            "parent_control": "A007",
-            "score": 0.461,
-            "confidence": "Related"
-          },
-          {
-            "activity_id": "A004.2",
-            "parent_control": "A004",
-            "score": 0.459,
-            "confidence": "Related"
-          },
-          {
-            "activity_id": "A004.1",
-            "parent_control": "A004",
-            "score": 0.439,
-            "confidence": "Related"
-          },
-          {
-            "activity_id": "A004.3",
-            "parent_control": "A004",
-            "score": 0.419,
-            "confidence": "Related"
-          },
-          {
-            "activity_id": "A004.4",
-            "parent_control": "A004",
-            "score": 0.419,
-            "confidence": "Related"
-          },
-          {
-            "activity_id": "E009.1",
-            "parent_control": "E009",
-            "score": 0.378,
-            "confidence": "Related"
-          },
-          {
-            "activity_id": "B008.1",
-            "parent_control": "B008",
-            "score": 0.37,
-            "confidence": "Related"
-          },
-          {
-            "activity_id": "B008.3",
-            "parent_control": "B008",
-            "score": 0.35,
-            "confidence": "Related"
-          }
-        ]
-      },
-      {
-        "owasp_id": "ASI05",
-        "owasp_title": "Unexpected CodeExecution (RCE)",
-        "mappings": [
-          {
-            "activity_id": "C006.2",
-            "parent_control": "C006",
-            "score": 0.61,
-            "confidence": "Direct"
-          },
-          {
-            "activity_id": "C006.1",
-            "parent_control": "C006",
-            "score": 0.59,
-            "confidence": "Direct"
-          },
-          {
-            "activity_id": "C006.3",
-            "parent_control": "C006",
-            "score": 0.57,
-            "confidence": "Direct"
-          },
-          {
-            "activity_id": "B001.1",
-            "parent_control": "B001",
-            "score": 0.561,
-            "confidence": "Direct"
-          },
-          {
-            "activity_id": "B001.2",
-            "parent_control": "B001",
-            "score": 0.521,
-            "confidence": "Related"
-          },
-          {
-            "activity_id": "B002.2",
-            "parent_control": "B002",
-            "score": 0.512,
-            "confidence": "Related"
-          },
-          {
-            "activity_id": "B002.1",
-            "parent_control": "B002",
-            "score": 0.492,
-            "confidence": "Related"
-          },
-          {
-            "activity_id": "B002.5",
-            "parent_control": "B002",
-            "score": 0.492,
-            "confidence": "Related"
-          },
-          {
-            "activity_id": "C004.2",
-            "parent_control": "C004",
-            "score": 0.478,
-            "confidence": "Related"
-          },
-          {
-            "activity_id": "B002.3",
-            "parent_control": "B002",
-            "score": 0.472,
-            "confidence": "Related"
-          },
-          {
-            "activity_id": "B002.4",
-            "parent_control": "B002",
-            "score": 0.472,
-            "confidence": "Related"
-          },
-          {
-            "activity_id": "C004.1",
-            "parent_control": "C004",
-            "score": 0.458,
-            "confidence": "Related"
-          },
-          {
-            "activity_id": "C004.3",
-            "parent_control": "C004",
-            "score": 0.458,
-            "confidence": "Related"
-          },
-          {
-            "activity_id": "B005.1",
-            "parent_control": "B005",
-            "score": 0.451,
-            "confidence": "Related"
-          },
-          {
-            "activity_id": "B005.2",
-            "parent_control": "B005",
-            "score": 0.451,
-            "confidence": "Related"
-          },
-          {
-            "activity_id": "B005.4",
-            "parent_control": "B005",
-            "score": 0.451,
-            "confidence": "Related"
-          },
-          {
-            "activity_id": "B005.5",
-            "parent_control": "B005",
-            "score": 0.451,
-            "confidence": "Related"
-          },
-          {
-            "activity_id": "B005.3",
-            "parent_control": "B005",
-            "score": 0.431,
-            "confidence": "Related"
-          },
-          {
-            "activity_id": "C005.1",
-            "parent_control": "C005",
-            "score": 0.411,
-            "confidence": "Related"
-          },
-          {
-            "activity_id": "B009.2",
-            "parent_control": "B009",
-            "score": 0.4,
-            "confidence": "Related"
-          },
-          {
-            "activity_id": "B009.3",
-            "parent_control": "B009",
-            "score": 0.4,
-            "confidence": "Related"
-          },
-          {
-            "activity_id": "C005.3",
-            "parent_control": "C005",
-            "score": 0.391,
-            "confidence": "Related"
-          },
-          {
-            "activity_id": "C003.1",
-            "parent_control": "C003",
-            "score": 0.383,
-            "confidence": "Related"
-          },
-          {
-            "activity_id": "B009.1",
-            "parent_control": "B009",
-            "score": 0.38,
-            "confidence": "Related"
-          },
-          {
-            "activity_id": "C005.2",
-            "parent_control": "C005",
-            "score": 0.371,
-            "confidence": "Related"
-          }
-        ]
-      },
-      {
-        "owasp_id": "ASI06",
-        "owasp_title": "Memory & Context Poisoning",
-        "mappings": [
-          {
-            "activity_id": "B001.1",
-            "parent_control": "B001",
-            "score": 0.539,
-            "confidence": "Related"
-          },
-          {
-            "activity_id": "B001.2",
-            "parent_control": "B001",
-            "score": 0.539,
-            "confidence": "Related"
-          },
-          {
-            "activity_id": "B002.2",
-            "parent_control": "B002",
-            "score": 0.503,
-            "confidence": "Related"
-          },
-          {
-            "activity_id": "B002.1",
-            "parent_control": "B002",
-            "score": 0.483,
-            "confidence": "Related"
-          },
-          {
-            "activity_id": "B002.4",
-            "parent_control": "B002",
-            "score": 0.483,
-            "confidence": "Related"
-          },
-          {
-            "activity_id": "B002.3",
-            "parent_control": "B002",
-            "score": 0.463,
-            "confidence": "Related"
-          },
-          {
-            "activity_id": "B002.5",
-            "parent_control": "B002",
-            "score": 0.463,
-            "confidence": "Related"
-          },
-          {
-            "activity_id": "B005.2",
-            "parent_control": "B005",
-            "score": 0.437,
-            "confidence": "Related"
-          },
-          {
-            "activity_id": "B005.4",
-            "parent_control": "B005",
-            "score": 0.437,
-            "confidence": "Related"
-          },
-          {
-            "activity_id": "B005.5",
-            "parent_control": "B005",
-            "score": 0.437,
-            "confidence": "Related"
-          },
-          {
-            "activity_id": "B005.1",
-            "parent_control": "B005",
-            "score": 0.417,
-            "confidence": "Related"
-          },
-          {
-            "activity_id": "B005.3",
-            "parent_control": "B005",
-            "score": 0.417,
-            "confidence": "Related"
-          }
-        ]
-      },
-      {
-        "owasp_id": "ASI07",
-        "owasp_title": "Insecure Inter-AgentCommunication",
-        "mappings": [
-          {
-            "activity_id": "A006.3",
-            "parent_control": "A006",
-            "score": 0.399,
-            "confidence": "Related"
-          },
-          {
-            "activity_id": "A006.1",
-            "parent_control": "A006",
-            "score": 0.379,
-            "confidence": "Related"
-          },
-          {
-            "activity_id": "A003.3",
-            "parent_control": "A003",
-            "score": 0.372,
-            "confidence": "Related"
-          },
-          {
-            "activity_id": "A005.2",
-            "parent_control": "A005",
-            "score": 0.363,
-            "confidence": "Related"
-          },
-          {
-            "activity_id": "A006.2",
-            "parent_control": "A006",
-            "score": 0.359,
-            "confidence": "Related"
-          }
-        ]
-      },
-      {
-        "owasp_id": "ASI08",
-        "owasp_title": "Cascading Failures",
-        "mappings": [
-          {
-            "activity_id": "B005.4",
-            "parent_control": "B005",
-            "score": 0.429,
-            "confidence": "Related"
-          },
-          {
-            "activity_id": "B005.3",
-            "parent_control": "B005",
-            "score": 0.409,
-            "confidence": "Related"
-          },
-          {
-            "activity_id": "B005.1",
-            "parent_control": "B005",
-            "score": 0.389,
-            "confidence": "Related"
-          },
-          {
-            "activity_id": "B005.2",
-            "parent_control": "B005",
-            "score": 0.389,
-            "confidence": "Related"
-          },
-          {
-            "activity_id": "B005.5",
-            "parent_control": "B005",
-            "score": 0.389,
-            "confidence": "Related"
-          }
-        ]
-      },
-      {
-        "owasp_id": "ASI09",
-        "owasp_title": "Human-Agent TrustExploitation",
-        "mappings": [
-          {
-            "activity_id": "C003.1",
-            "parent_control": "C003",
-            "score": 0.618,
-            "confidence": "Direct"
-          },
-          {
-            "activity_id": "C003.2",
-            "parent_control": "C003",
-            "score": 0.618,
-            "confidence": "Direct"
-          },
-          {
-            "activity_id": "C003.3",
-            "parent_control": "C003",
-            "score": 0.558,
-            "confidence": "Direct"
-          },
-          {
-            "activity_id": "C003.4",
-            "parent_control": "C003",
-            "score": 0.558,
-            "confidence": "Direct"
-          },
-          {
-            "activity_id": "D001.3",
-            "parent_control": "D001",
-            "score": 0.52,
-            "confidence": "Related"
-          },
-          {
-            "activity_id": "D001.1",
-            "parent_control": "D001",
-            "score": 0.5,
-            "confidence": "Related"
-          },
-          {
-            "activity_id": "D001.2",
-            "parent_control": "D001",
-            "score": 0.5,
-            "confidence": "Related"
-          },
-          {
-            "activity_id": "C005.1",
-            "parent_control": "C005",
-            "score": 0.437,
-            "confidence": "Related"
-          },
-          {
-            "activity_id": "D002.1",
-            "parent_control": "D002",
-            "score": 0.428,
-            "confidence": "Related"
-          },
-          {
-            "activity_id": "E009.1",
-            "parent_control": "E009",
-            "score": 0.406,
-            "confidence": "Related"
-          },
-          {
-            "activity_id": "A003.1",
-            "parent_control": "A003",
-            "score": 0.403,
-            "confidence": "Related"
-          },
-          {
-            "activity_id": "A003.3",
-            "parent_control": "A003",
-            "score": 0.403,
-            "confidence": "Related"
-          },
-          {
-            "activity_id": "C005.2",
-            "parent_control": "C005",
-            "score": 0.397,
-            "confidence": "Related"
-          },
-          {
-            "activity_id": "C005.3",
-            "parent_control": "C005",
-            "score": 0.397,
-            "confidence": "Related"
-          },
-          {
-            "activity_id": "B004.1",
-            "parent_control": "B004",
-            "score": 0.385,
-            "confidence": "Related"
-          },
-          {
-            "activity_id": "B004.3",
-            "parent_control": "B004",
-            "score": 0.385,
-            "confidence": "Related"
-          },
-          {
-            "activity_id": "A003.2",
-            "parent_control": "A003",
-            "score": 0.383,
-            "confidence": "Related"
-          },
-          {
-            "activity_id": "B007.1",
-            "parent_control": "B007",
-            "score": 0.382,
-            "confidence": "Related"
-          },
-          {
-            "activity_id": "B004.2",
-            "parent_control": "B004",
-            "score": 0.365,
-            "confidence": "Related"
-          },
-          {
-            "activity_id": "B004.4",
-            "parent_control": "B004",
-            "score": 0.365,
-            "confidence": "Related"
-          },
-          {
-            "activity_id": "C001.1",
-            "parent_control": "C001",
-            "score": 0.363,
-            "confidence": "Related"
-          },
-          {
-            "activity_id": "C001.2",
-            "parent_control": "C001",
-            "score": 0.363,
-            "confidence": "Related"
-          },
-          {
-            "activity_id": "B007.2",
-            "parent_control": "B007",
-            "score": 0.362,
-            "confidence": "Related"
-          },
-          {
-            "activity_id": "E016.4",
-            "parent_control": "E016",
-            "score": 0.362,
-            "confidence": "Related"
-          },
-          {
-            "activity_id": "E008.2",
-            "parent_control": "E008",
-            "score": 0.36,
-            "confidence": "Related"
-          },
-          {
-            "activity_id": "A005.2",
-            "parent_control": "A005",
-            "score": 0.357,
-            "confidence": "Related"
-          },
-          {
-            "activity_id": "C008.1",
-            "parent_control": "C008",
-            "score": 0.355,
-            "confidence": "Related"
-          }
-        ]
-      },
-      {
-        "owasp_id": "ASI10",
-        "owasp_title": "Rogue Agents",
-        "mappings": [
-          {
-            "activity_id": "B007.1",
-            "parent_control": "B007",
-            "score": 0.433,
-            "confidence": "Related"
-          },
-          {
-            "activity_id": "B009.3",
-            "parent_control": "B009",
-            "score": 0.416,
-            "confidence": "Related"
-          },
-          {
-            "activity_id": "B007.2",
-            "parent_control": "B007",
-            "score": 0.413,
-            "confidence": "Related"
-          },
-          {
-            "activity_id": "B003.1",
-            "parent_control": "B003",
-            "score": 0.409,
-            "confidence": "Related"
-          },
-          {
-            "activity_id": "B003.2",
-            "parent_control": "B003",
-            "score": 0.409,
-            "confidence": "Related"
-          },
-          {
-            "activity_id": "C001.1",
-            "parent_control": "C001",
-            "score": 0.404,
-            "confidence": "Related"
-          },
-          {
-            "activity_id": "B009.1",
-            "parent_control": "B009",
-            "score": 0.396,
-            "confidence": "Related"
-          },
-          {
-            "activity_id": "B009.2",
-            "parent_control": "B009",
-            "score": 0.396,
-            "confidence": "Related"
-          },
-          {
-            "activity_id": "C003.2",
-            "parent_control": "C003",
-            "score": 0.375,
-            "confidence": "Related"
-          },
-          {
-            "activity_id": "D002.1",
-            "parent_control": "D002",
-            "score": 0.362,
-            "confidence": "Related"
-          },
-          {
-            "activity_id": "A006.3",
-            "parent_control": "A006",
-            "score": 0.36,
-            "confidence": "Related"
-          },
-          {
-            "activity_id": "C003.1",
-            "parent_control": "C003",
-            "score": 0.355,
-            "confidence": "Related"
-          },
-          {
-            "activity_id": "C005.1",
-            "parent_control": "C005",
-            "score": 0.353,
-            "confidence": "Related"
-          }
-        ]
-      }
-    ]
+    "unmapped_count": 18,
+    "note": "Unmapped controls did not reach the Related threshold for any OWASP Agentic Top 10 entry under the current 4-signal scoring model."
   }
 }

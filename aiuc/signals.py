@@ -1,9 +1,10 @@
 """Signal computation for AIUC-1 ↔ OWASP Agentic Top 10 mapping.
 
-Three complementary signals:
-  1. Reference Bridge  (weight 0.45) — Jaccard overlap on shared OWASP LLM Top 10 refs
-  2. Semantic Similarity (weight 0.35) — Sentence-transformer cosine similarity
-  3. TF-IDF Keyword     (weight 0.20) — TF-IDF cosine with synonym expansion
+Three content signals with multiplicative function-match boost:
+  1. Reference Bridge   (weight 0.467) — Jaccard overlap on shared OWASP LLM Top 10 refs
+  2. Semantic Similarity (weight 0.333) — Sentence-transformer cosine similarity
+  3. TF-IDF Keyword      (weight 0.200) — TF-IDF cosine with synonym expansion
+  4. Function Match      (boost  0.5  ) — Multiplicative uplift when function class matches
 """
 
 from __future__ import annotations
@@ -15,6 +16,8 @@ import numpy as np
 from numpy.typing import NDArray
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity as sklearn_cosine
+
+from aiuc.taxonomy import AIUC_CONTROL_FUNCTIONS, THREAT_FUNCTION_PROFILES
 
 if TYPE_CHECKING:
     from sentence_transformers import SentenceTransformer
@@ -129,6 +132,13 @@ def _build_owasp_text(entry: OWASPEntry) -> str:
     return " ".join(p for p in parts if p)
 
 
+def _build_prevention_text(entry: OWASPEntry) -> str:
+    """Build text from prevention guidelines only, falling back to full text."""
+    if entry.prevention_guidelines:
+        return " ".join(entry.prevention_guidelines)
+    return _build_owasp_text(entry)
+
+
 def compute_semantic_similarity(
     aiuc_controls: list[Control],
     owasp_entries: list[OWASPEntry],
@@ -137,8 +147,11 @@ def compute_semantic_similarity(
     """Compute cosine similarity using sentence-transformer embeddings.
 
     Returns matrix of shape (len(aiuc_controls), len(owasp_entries)).
-    Z-score normalized within each AIUC control row to discriminate
-    beyond the high baseline similarity that all AI-security texts share.
+
+    Computes similarity against both the full OWASP text and prevention
+    guidelines separately, takes the element-wise max, then Z-score
+    normalizes within each AIUC control row to discriminate beyond the
+    high baseline similarity that all AI-security texts share.
     """
     from sentence_transformers import SentenceTransformer
 
@@ -146,17 +159,25 @@ def compute_semantic_similarity(
 
     aiuc_texts = [_build_document_text(c) for c in aiuc_controls]
     owasp_texts = [_build_owasp_text(e) for e in owasp_entries]
+    prevention_texts = [_build_prevention_text(e) for e in owasp_entries]
 
     aiuc_embeddings = model.encode(aiuc_texts, show_progress_bar=False)
     owasp_embeddings = model.encode(owasp_texts, show_progress_bar=False)
+    prevention_embeddings = model.encode(prevention_texts, show_progress_bar=False)
 
     raw_sim: NDArray[np.float64] = sklearn_cosine(aiuc_embeddings, owasp_embeddings)
+    prevention_sim: NDArray[np.float64] = sklearn_cosine(
+        aiuc_embeddings, prevention_embeddings,
+    )
+
+    # Element-wise max before normalization
+    combined = np.maximum(raw_sim, prevention_sim)
 
     # Z-score normalize per row (per AIUC control)
-    row_means = raw_sim.mean(axis=1, keepdims=True)
-    row_stds = raw_sim.std(axis=1, keepdims=True)
+    row_means = combined.mean(axis=1, keepdims=True)
+    row_stds = combined.std(axis=1, keepdims=True)
     row_stds = np.where(row_stds < 1e-8, 1.0, row_stds)
-    z_scores = (raw_sim - row_means) / row_stds
+    z_scores = (combined - row_means) / row_stds
 
     # Scale z-scores to [0, 1] range using sigmoid-like transform
     normalized = 1.0 / (1.0 + np.exp(-z_scores))
@@ -208,33 +229,81 @@ def compute_keyword_similarity(
     return similarity.astype(np.float64)
 
 
+# ── Signal 4: Function Match ───────────────────────────────────────────────
+
+
+def compute_function_match(
+    aiuc_controls: list[Control],
+    owasp_entries: list[OWASPEntry],
+) -> NDArray[np.float64]:
+    """Binary match: control's function class ∈ threat's function profile.
+
+    Returns matrix of shape (len(aiuc_controls), len(owasp_entries))
+    with values 0.0 or 1.0.
+    """
+    n_aiuc = len(aiuc_controls)
+    n_owasp = len(owasp_entries)
+    matrix = np.zeros((n_aiuc, n_owasp), dtype=np.float64)
+
+    for i, ctrl in enumerate(aiuc_controls):
+        func = AIUC_CONTROL_FUNCTIONS.get(ctrl.id)
+        if func is None:
+            continue
+        for j, entry in enumerate(owasp_entries):
+            profile = THREAT_FUNCTION_PROFILES.get(entry.identifier, set())
+            if func in profile:
+                matrix[i, j] = 1.0
+
+    return matrix
+
+
 # ── Composite Score ──────────────────────────────────────────────────────────
 
 
 def compute_composite_scores(
     aiuc_controls: list[Control],
     owasp_entries: list[OWASPEntry],
-    weights: tuple[float, float, float] = (0.45, 0.35, 0.20),
+    weights: tuple[float, float, float] = (0.467, 0.333, 0.200),
+    function_boost: float = 0.5,
     model_name: str = "all-MiniLM-L6-v2",
-) -> tuple[NDArray[np.float64], NDArray[np.float64], NDArray[np.float64], NDArray[np.float64]]:
-    """Compute all three signals and the weighted composite.
+) -> tuple[
+    NDArray[np.float64],
+    NDArray[np.float64],
+    NDArray[np.float64],
+    NDArray[np.float64],
+    NDArray[np.float64],
+]:
+    """Compute all four signals and the weighted composite.
+
+    Function match is applied as a multiplicative boost on the content
+    score rather than an additive 4th signal.  This ensures that
+    function-class relevance amplifies genuine content matches but
+    cannot create a mapping on its own.
 
     Args:
         aiuc_controls: List of AIUC-1 controls.
         owasp_entries: List of OWASP Agentic Top 10 entries.
         weights: Tuple of (reference_bridge, semantic, keyword) weights.
+            Should sum to 1.0 so the content score is in [0, 1].
+        function_boost: Multiplicative uplift when function class matches
+            the threat profile.  0.5 means a 50 % confidence boost.
         model_name: Sentence transformer model name.
 
     Returns:
-        Tuple of (composite, reference_bridge, semantic, keyword) matrices.
-        Each has shape (len(aiuc_controls), len(owasp_entries)).
+        Tuple of (composite, reference_bridge, semantic, keyword,
+        function_match) matrices, each of shape
+        (len(aiuc_controls), len(owasp_entries)).
     """
     w_ref, w_sem, w_kw = weights
 
     ref_bridge = compute_reference_bridge(aiuc_controls, owasp_entries)
     semantic = compute_semantic_similarity(aiuc_controls, owasp_entries, model_name)
     keyword = compute_keyword_similarity(aiuc_controls, owasp_entries)
+    func_match = compute_function_match(aiuc_controls, owasp_entries)
 
-    composite = w_ref * ref_bridge + w_sem * semantic + w_kw * keyword
+    content = w_ref * ref_bridge + w_sem * semantic + w_kw * keyword
+    composite = np.minimum(
+        content * (1.0 + function_boost * func_match), 1.0,
+    )
 
-    return composite, ref_bridge, semantic, keyword
+    return composite, ref_bridge, semantic, keyword, func_match

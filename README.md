@@ -8,21 +8,23 @@ Produces a reproducible, tunable bi-directional mapping at both **control level*
 
 | Metric | Value |
 |--------|-------|
-| AIUC-1 controls mapped | 21 / 51 (41%) |
-| OWASP entries with AIUC matches | 9 / 10 |
-| Control-level mappings | 36 (5 Direct, 31 Related) |
-| Sub-activity mappings | 129 across 132 activities |
-| Anchor pair validation | 6 / 10 correct tier |
+| AIUC-1 controls mapped | 43 / 51 (84%) |
+| OWASP entries with AIUC matches | 10 / 10 |
+| Control-level mappings | 73 (27 Direct, 46 Related) |
+| Rationale codes assigned | Yes (8-class taxonomy) |
+| Relevance classification | Yes (Primary/Secondary) |
+| Output schema | v2 (`schemas/crosswalk-mapping-v2.schema.json`) |
+| Anchor pair validation | 10 / 10 correct tier |
 
 ### Strongest Mappings (Direct tier)
 
 | AIUC Control | OWASP Entry | Score |
 |-------------|-------------|-------|
-| D004 — Third-party testing of tool calls | ASI02 — Tool Misuse and Exploitation | 0.779 |
-| E006 — Conduct vendor due diligence | ASI04 — Agentic Supply Chain Vulnerabilities | 0.752 |
-| C006 — Prevent output vulnerabilities | ASI05 — Unexpected Code Execution (RCE) | 0.570 |
-| E005 — Assess cloud vs on-prem processing | ASI04 — Agentic Supply Chain Vulnerabilities | 0.661 |
-| C003 — Prevent harmful outputs | ASI09 — Human-Agent Trust Exploitation | 0.558 |
+| D004 — Third-party testing of tool calls | ASI02 — Tool Misuse and Exploitation | 1.000 |
+| E006 — Conduct vendor due diligence | ASI04 — Agentic Supply Chain Vulnerabilities | 1.000 |
+| C006 — Prevent output vulnerabilities | ASI05 — Unexpected Code Execution (RCE) | 0.817 |
+| D003 — Restrict unsafe tool calls | ASI02 — Tool Misuse and Exploitation | 0.707 |
+| B005 — Implement real-time input filtering | ASI01 — Agent Goal Hijack | 0.618 |
 
 ## Methodology
 
@@ -36,19 +38,23 @@ The solution is a **multi-signal hybrid** that combines three independent eviden
 
 ### Composite Score
 
+Three content signals are combined into a content score, then multiplied by a function-match boost:
+
 ```
-composite = 0.45 × reference_bridge + 0.35 × semantic + 0.20 × keyword
+content   = 0.467 × reference_bridge + 0.333 × semantic + 0.200 × keyword
+composite = min(content × (1 + 0.5 × function_match), 1.0)
 ```
 
-| Signal | Weight | Technique |
-|--------|--------|-----------|
-| **Reference Bridge** | 0.45 | Jaccard overlap on shared OWASP LLM Top 10 references (LLM01–LLM10) |
-| **Semantic Similarity** | 0.35 | Sentence-transformer embeddings (`all-MiniLM-L6-v2`), Z-score normalized per row, sigmoid-mapped to [0,1] |
-| **TF-IDF Keyword** | 0.20 | TF-IDF cosine similarity with bigrams and 24 domain-specific synonym groups |
+| Signal | Weight/Boost | Technique |
+|--------|-------------|-----------|
+| **Reference Bridge** | 0.467 | Jaccard overlap on shared OWASP LLM Top 10 references (LLM01–LLM10) |
+| **Semantic Similarity** | 0.333 | Sentence-transformer embeddings (`all-MiniLM-L6-v2`), Z-score normalized per row, sigmoid-mapped to [0,1], with prevention-guideline boosting |
+| **TF-IDF Keyword** | 0.200 | TF-IDF cosine similarity with bigrams and 24 domain-specific synonym groups |
+| **Function Match** | ×1.5 boost | Binary: control's function class ∈ threat's function profile. Applied as 50% multiplicative uplift, not additive |
 
 ---
 
-### Signal 1: Reference Bridge (Weight: 0.45)
+### Signal 1: Reference Bridge (Weight: 0.467)
 
 #### What it measures
 
@@ -68,7 +74,7 @@ Jaccard(A, B) = ─────────────
 
 **Another example**: AIUC B002 cites `{LLM01, LLM08, LLM10}` and OWASP ASI06 cites `{LLM01, LLM04, LLM08}`. Intersection: `{LLM01, LLM08}` (2). Union: `{LLM01, LLM04, LLM08, LLM10}` (4). Jaccard = 2/4 = **0.5**.
 
-#### Why this signal gets the highest weight (0.45)
+#### Why this signal gets the highest weight (0.467)
 
 The reference bridge is the most *precise* signal. If two documents independently chose to cite the same specific vulnerabilities, the authors considered them related — regardless of whether the prose uses similar words. It has very few false positives. The tradeoff is *recall*: many valid pairs don't share LLM references (either because the AIUC control has no OWASP LLM citations, or the connection is thematic rather than reference-based). The other two signals compensate for this.
 
@@ -80,7 +86,7 @@ The reference bridge is the most *precise* signal. If two documents independentl
 
 ---
 
-### Signal 2: Semantic Similarity (Weight: 0.35)
+### Signal 2: Semantic Similarity (Weight: 0.333)
 
 #### What it measures
 
@@ -122,9 +128,9 @@ normalized = 1 / (1 + e^(-z_score))
 
 This ensures the output is bounded, with 0.5 representing "average similarity" and values above 0.5 meaning "above average for this control."
 
-#### Why this signal gets weight 0.35
+#### Why this signal gets weight 0.333
 
-Semantic similarity captures thematic connections that reference overlap misses. It's the broadest signal — it works even when neither document cites OWASP LLM entries. However, it's less precise than reference bridge (the high-baseline problem means some noise survives normalization) and less explainable to auditors. Weight 0.35 reflects this: important but not dominant.
+Semantic similarity captures thematic connections that reference overlap misses. It's the broadest signal — it works even when neither document cites OWASP LLM entries. However, it's less precise than reference bridge (the high-baseline problem means some noise survives normalization) and less explainable to auditors. Weight 0.333 reflects this: important but not dominant.
 
 #### Why `all-MiniLM-L6-v2`
 
@@ -132,7 +138,7 @@ This model provides a good balance of speed, size (~80 MB), and quality. It's fa
 
 ---
 
-### Signal 3: TF-IDF Keyword Similarity (Weight: 0.20)
+### Signal 3: TF-IDF Keyword Similarity (Weight: 0.200)
 
 #### What it measures
 
@@ -169,25 +175,48 @@ When a document contains any term from a group, all other terms in that group ar
 
 After converting each document into a TF-IDF vector (with 5,000 max features), we compute cosine similarity between AIUC and OWASP vectors. The result is a score from 0 (no term overlap) to 1 (identical term distribution).
 
-#### Why this signal gets the lowest weight (0.20)
+#### Why this signal gets the lowest weight (0.200)
 
-Keyword matching is brittle — it rewards surface-level word overlap without understanding meaning. Two documents about completely different topics can score high if they share generic terms. It also can't catch paraphrases or conceptual equivalences beyond the 24 synonym groups. However, it provides a useful "sanity check" and catches cases where the semantic model's normalization accidentally suppresses a genuine keyword match. Weight 0.20 keeps it contributory but not decisive.
+Keyword matching is brittle — it rewards surface-level word overlap without understanding meaning. Two documents about completely different topics can score high if they share generic terms. It also can't catch paraphrases or conceptual equivalences beyond the 24 synonym groups. However, it provides a useful "sanity check" and catches cases where the semantic model's normalization accidentally suppresses a genuine keyword match. Weight 0.200 keeps it contributory but not decisive.
 
 ---
 
-### Why These Three Signals (and Not Others)
+### Signal 4: Function Match (Boost: ×1.5)
 
-The three signals were chosen to be **complementary along different dimensions**:
+#### What it measures
 
-| Dimension | Reference Bridge | Semantic | Keyword |
-|-----------|-----------------|----------|---------|
-| Evidence type | Structural (shared citations) | Meaning (NLP) | Lexical (exact terms) |
-| Precision | Very high | Medium | Low–medium |
-| Recall | Low (many pairs lack shared refs) | High | Medium |
-| Explainability | High (auditors can verify) | Low (black-box model) | Medium |
-| Failure mode | Misses pairs without LLM refs | High baseline noise | Surface-level false matches |
+Whether a control's *defense function* is relevant to a specific threat. This uses domain knowledge encoded in the control-function taxonomy (`aiuc/taxonomy.py`) rather than text analysis.
 
-Each signal's weakness is another signal's strength. Reference bridge is precise but narrow; semantic is broad but noisy; keyword is transparent but shallow. The weighted combination outperforms any individual signal.
+#### How it works: Control-Function Taxonomy
+
+Each control is assigned one of 8 function classes (PREV, SCOPE, GATE, DETECT, VALID, GOVERN, ISOLATE, DISCLOSE) based on its defense role. Each OWASP threat has a function profile listing which classes are relevant. For example, ASI01 (Agent Goal Hijack) is addressed by PREV, SCOPE, GATE, VALID, DETECT, and GOVERN controls.
+
+For each (control, threat) pair:
+- Look up the control's function class from `AIUC_CONTROL_FUNCTIONS`
+- Look up the threat's applicable classes from `THREAT_FUNCTION_PROFILES`
+- If the control's class is in the threat's profile: `function_match = 1.0`, else `0.0`
+
+#### Why multiplicative (not additive)
+
+Function match is a **confidence amplifier**, not evidence. It answers "is this *type* of control relevant to this threat?" — a necessary but not sufficient condition. Adding it as a 4th weighted signal (as in early versions) created a score floor: every function-matched control cleared the threshold regardless of content evidence, producing hundreds of false positives.
+
+The multiplicative approach (`content × 1.5`) ensures that function match can *boost* a genuine content match but cannot *create* one from nothing. A control with zero reference overlap and average semantic similarity stays below threshold even with function match = 1.0.
+
+---
+
+### Why These Four Signals (and Not Others)
+
+The four signals were chosen to be **complementary along different dimensions**:
+
+| Dimension | Reference Bridge | Semantic | Keyword | Function Match |
+|-----------|-----------------|----------|---------|----------------|
+| Evidence type | Structural (shared citations) | Meaning (NLP) | Lexical (exact terms) | Structural (control function) |
+| Precision | Very high | Medium | Low–medium | High |
+| Recall | Low (many pairs lack shared refs) | High | Medium | High |
+| Explainability | High (auditors can verify) | Low (black-box model) | Medium | High |
+| Failure mode | Misses pairs without LLM refs | High baseline noise | Surface-level false matches | Over-maps cross-cutting controls |
+
+Each signal's weakness is another signal's strength. Reference bridge is precise but narrow; semantic is broad but noisy; keyword is transparent but shallow; function match provides structural domain knowledge but can't distinguish specific vs generic relevance within a function class. The multiplicative combination outperforms any individual signal.
 
 **Signals considered but not used:**
 - **Citation co-occurrence** (beyond LLM Top 10): The two frameworks cite different standards (AIUC cites EU AI Act, NIST; OWASP cites ATLAS, SAIF). Too sparse to be useful.
@@ -201,31 +230,28 @@ Each signal's weakness is another signal's strength. Reference bridge is precise
 | Tier | Threshold | Included in output? | Meaning |
 |------|-----------|---------------------|---------|
 | Direct | ≥ 0.55 | Yes (green) | Strong evidence from multiple signals |
-| Related | ≥ 0.35 | Yes (yellow) | Meaningful connection, typically 1–2 strong signals |
+| Related (Primary) | ≥ 0.35 | Yes (yellow) | Meaningful connection for Primary-classified mappings |
+| Related (Secondary) | ≥ 0.50 | Yes (yellow) | Meaningful connection for Secondary-classified mappings (higher evidence bar) |
 | Tangential | ≥ 0.20 | No (filtered) | Weak connection, likely coincidental overlap |
 | None | < 0.20 | No | No meaningful connection |
 
+**Governance floor**: GOVERN and DISCLOSE controls with `function_match = 1.0` that are classified as Primary are promoted to Related at a lower threshold of **0.22**. These controls have structurally generic text (policy language) that produces weak content signals across all standards — the floor ensures they aren't systematically excluded when domain knowledge confirms their relevance.
+
 #### How the Thresholds Were Calibrated
 
-The thresholds are not arbitrary — they were calibrated against a set of **10 anchor pairs**: control-OWASP pairs where a domain expert manually assessed the expected relationship strength based on shared LLM references and conceptual alignment.
+The thresholds are calibrated against **10 anchor pairs** where a domain expert manually assessed the expected tier. All 10 match their expected tier.
 
 ```python
 # Example anchor pairs from mapper.py
 {"aiuc": "D004", "owasp": "ASI02", "expected": "Direct"},   # Perfect ref overlap
 {"aiuc": "E006", "owasp": "ASI04", "expected": "Direct"},   # Perfect ref overlap
 {"aiuc": "B001", "owasp": "ASI01", "expected": "Related"},  # Jaccard 1/4
-{"aiuc": "B002", "owasp": "ASI06", "expected": "Related"},  # Jaccard 2/4
+{"aiuc": "B002", "owasp": "ASI06", "expected": "Direct"},   # Strong ref + func boost
 ```
 
-The **Direct threshold (0.55)** was set so that pairs with perfect or near-perfect reference overlap (Jaccard ≥ 0.5 on the highest-weighted signal) reliably land in the Direct tier. At the current weights, a pair with reference bridge = 1.0 and average scores on the other signals gets a composite around 0.70–0.80, well above 0.55.
+The **relevance-aware threshold** design reflects the principle that Primary mappings (which the classification layer identifies with 100% rationale accuracy) need less content evidence than Secondary mappings. This avoids both over-inclusion of weakly-supported Secondary pairs and under-inclusion of structurally important Primary pairs.
 
-The **Related threshold (0.35)** was set to capture pairs with moderate reference overlap (Jaccard 1/4 to 1/3) or strong semantic similarity. It corresponds roughly to "at least one signal showing meaningful alignment." Lowering it would include too many tangential matches; raising it would exclude pairs that domain experts consider related.
-
-The **Tangential threshold (0.20)** acts as a noise floor. Below this, any apparent similarity is likely from shared generic AI-security vocabulary.
-
-The pipeline validates thresholds on every run by checking the 10 anchor pairs against their expected tiers (6/10 match currently — the mismatches are documented and understood, primarily involving pairs where the AIUC control has broad references that inflate the expected Jaccard).
-
-All thresholds are tunable via CLI flags (`--t-direct`, `--t-related`, `--t-tangential`) for experimentation.
+All thresholds are tunable via CLI flags (`--t-direct`, `--t-related`, `--t-sec-related`, `--t-tangential`, `--t-gov-floor`).
 
 ---
 
@@ -243,15 +269,77 @@ Each mapping is annotated with a relationship type inferred from the AIUC contro
 
 The inference is hierarchical: control metadata (if available) takes priority over signal-based inference. This ensures that AIUC controls explicitly classified as preventative or detective are labeled accurately, while the signal-based rules handle the majority of mappings where control type metadata is not specific enough.
 
+---
+
+### Rationale and Relevance Classification
+
+Every mapping carries a **rationale code** (why the mapping exists) and a **relevance level** (how directly it mitigates the threat). These are computed deterministically by `aiuc/taxonomy.py`.
+
+#### Rationale Taxonomy (8 classes)
+
+| Code | Label | Definition |
+|------|-------|------------|
+| PREV | Prevent | Directly blocks the core attack mechanism |
+| SCOPE | Constrain scope | Limits blast radius after compromise |
+| GATE | Human gate | Enforces human approval or intervention |
+| DETECT | Detect and trace | Runtime detection or forensic traceability |
+| VALID | Validate and test | Tests or audits that other controls work |
+| GOVERN | Policy and governance | Organizational policy or accountability |
+| ISOLATE | Isolate and contain | Architectural separation preventing propagation |
+| DISCLOSE | Disclose and calibrate | Transparency enabling trust calibration |
+
+Each control is assigned exactly one function class. The assignment is static for AIUC-1 (`AIUC_CONTROL_FUNCTIONS` in taxonomy.py) and keyword-based for new standards (`FUNCTION_KEYWORDS`).
+
+#### Primary/Secondary Classification
+
+Relevance is determined per (control, threat) pair using threat-specific profiles (`THREAT_PROFILES` in taxonomy.py). The rules include:
+
+- **Function-class match**: If the control's function class is in the threat's `primary_functions` set → Primary
+- **Topic match**: If the control's title matches any of the threat's `primary_topics` regexes → Primary
+- **DETECT subcategory**: Each threat specifies a `detect_rule` (all, generic_only, specific_only, never) that determines whether DETECT controls are Primary or Secondary
+- **DISCLOSE handling**: Only specific DISCLOSE controls listed in `disclose_primary` are Primary
+- **Default**: Secondary
+
+#### Validation Results
+
+| Dataset | Standard | Mappings | Rationale Accuracy | Relevance Accuracy |
+|---------|----------|----------|-------------------|-------------------|
+| Training | AIUC-1 | 119 | 100.0% | 99.2% |
+| Validation | NIST AI RMF 1.0 | 66 | 100.0% | 84.8% |
+| Generalization gap | — | — | 0.0% | 14.3% |
+
+Run `pytest tests/test_classification.py -v` to verify. See `tests/test_data.json` for ground truth.
+
+---
+
+### Output Schema (v2)
+
+The pipeline output conforms to `schemas/crosswalk-mapping-v2.schema.json`, validated on every run.
+
+**Key design decisions:**
+- **Standard-agnostic field names**: `control_id` / `domain` instead of `aiuc_id` / `aiuc_domain` — the same schema validates NIST, ISO, or EU AI Act mappings
+- **Score and signals are optional**: Required for diagnostic output; omit for published crosswalks
+- **Function coverage per threat**: Each OWASP entry reports how many controls cover each rationale code, highlighting defense-in-depth gaps
+- **Gap analysis**: Unmapped controls are listed with a `gap_reason` explaining why
+
+See [schemas/README.md](schemas/README.md) for full documentation, rationale taxonomy definitions, and validation instructions.
+
+The `--validate-schema` flag (default: on) runs jsonschema validation after every pipeline run. Use `--no-validate-schema` to skip.
+
 ## Project Structure
 
 ```
 ├── aiuc/
-│   ├── models.py              # Pydantic schemas (AIUC-1, OWASP, mapping output)
-│   ├── signals.py             # 3 signal computation functions
+│   ├── models.py              # Pydantic schemas (v1 + v2 crosswalk models)
+│   ├── taxonomy.py            # Control-function taxonomy and classification rules
+│   ├── signals.py             # 4 signal computation (3 content + multiplicative boost)
 │   ├── mapper.py              # Mapping orchestrator + anchor validation
-│   ├── output.py              # Excel (5-sheet) + JSON generation
+│   ├── output.py              # Excel (5-sheet) + v2 JSON generation
 │   └── aiuc-1-standard.json   # AIUC-1 standard (51 controls, 132 activities)
+│
+├── schemas/
+│   ├── crosswalk-mapping-v2.schema.json  # v2 output JSON Schema
+│   └── README.md              # Schema documentation + rationale taxonomy
 │
 ├── owasp/
 │   └── ...FINAL.json          # OWASP Top 10 for Agentic Applications 2026
@@ -260,10 +348,16 @@ The inference is hierarchical: control metadata (if available) takes priority ov
 │   ├── aiuc_owasp_mapping.xlsx
 │   └── aiuc_owasp_mapping.json
 │
+├── tests/
+│   ├── test_classification.py # Rationale + relevance test harness
+│   ├── test_data.json         # 119 AIUC training + 66 NIST validation mappings
+│   └── test_readme_sheet.py   # Excel README sheet tests
+│
 ├── scripts/
 │   ├── build_aiuc_json.py     # Builds AIUC-1 JSON from scraped data
 │   ├── run_scraper.py         # CLI: regenerate AIUC-1 JSON
-│   └── run_mapping.py         # CLI: run mapping pipeline
+│   ├── run_mapping.py         # CLI: run mapping pipeline
+│   └── evaluate_pipeline.py   # Pipeline recall/precision evaluation
 │
 └── pyproject.toml
 ```
@@ -290,20 +384,14 @@ python scripts/run_mapping.py
 Output:
 
 ```
-Loading AIUC-1 from aiuc/aiuc-1-standard.json...
-  Loaded 51 controls across 6 domains
-Loading OWASP from owasp/...FINAL.json...
-  Loaded 10 entries
-
-Weights: ref=0.45, sem=0.35, kw=0.2
-Thresholds: direct=0.55, related=0.35, tangential=0.2
-
-Running mapping pipeline...
+Weights: ref=0.467, sem=0.333, kw=0.2, boost=0.5
+Thresholds: direct=0.55, related=0.35, tangential=0.2, gov_floor=0.22
 
 Done!
-  Control-level: 36 (5 Direct, 31 Related)
-  Excel: mapping/aiuc_owasp_mapping.xlsx
-  JSON:  mapping/aiuc_owasp_mapping.json
+  Control-level: 73 mappings
+    Confidence:  27 Direct, 46 Related
+    Relevance:   51 Primary, 22 Secondary
+  Schema validation: PASSED
 ```
 
 ### Tune parameters
@@ -311,14 +399,20 @@ Done!
 All weights and thresholds are adjustable via CLI flags:
 
 ```bash
-# Increase reference bridge weight, lower direct threshold
-python scripts/run_mapping.py --w-ref 0.50 --w-sem 0.30 --t-direct 0.50
+# Adjust content weights and function boost
+python scripts/run_mapping.py --w-ref 0.50 --w-sem 0.30 --w-kw 0.20 --w-boost 0.5
 
 # Use a different embedding model
 python scripts/run_mapping.py --model all-mpnet-base-v2
 
+# Adjust relevance-aware thresholds
+python scripts/run_mapping.py --t-related 0.35 --t-sec-related 0.50 --t-gov-floor 0.22
+
 # Verbose logging (shows anchor pair validation)
 python scripts/run_mapping.py -v
+
+# Skip schema validation
+python scripts/run_mapping.py --no-validate-schema
 ```
 
 ### Regenerate AIUC-1 JSON
@@ -333,47 +427,58 @@ python scripts/run_scraper.py
 
 | Sheet | Rows | Key Columns |
 |-------|------|-------------|
-| README | — | Instructional guide: workbook overview, column definitions, scoring methodology, confidence tiers, framework glossaries, quick-start |
-| AIUC→OWASP (Control) | 51 AIUC controls | OWASP ID, Score, Confidence, Signal Breakdown, Relationship |
-| OWASP→AIUC (Control) | 10 OWASP entries | AIUC ID, Domain, Score, Confidence, Relationship |
+| README | — | Rationale taxonomy, relevance classification, scoring methodology, confidence tiers, framework glossaries |
+| AIUC→OWASP (Control) | 51 AIUC controls | Function Class, Rationale, Relevance, Score, Confidence, Signal Breakdown |
+| OWASP→AIUC (Control) | 10 OWASP entries | Function Coverage, Uncovered Functions, Rationale, Relevance, Score, Confidence |
 | AIUC→OWASP (Activity) | 132 sub-activities | OWASP ID, Score, Confidence |
 | OWASP→AIUC (Activity) | 10 OWASP entries | Activity ID, Parent Control, Score, Confidence |
 
-Styled with color-coded confidence tiers: green (Direct), yellow (Related).
+Styled with color-coded confidence tiers (green=Direct, yellow=Related) and relevance (blue=Primary, gray=Secondary).
 
-### JSON Schema
+### JSON Output (v2 Schema)
+
+The JSON output conforms to `schemas/crosswalk-mapping-v2.schema.json`. Key sections:
 
 ```json
 {
   "metadata": {
-    "generated_at": "...",
-    "methodology": "multi-signal-hybrid",
-    "weights": { "reference_bridge": 0.45, "semantic": 0.35, "keyword": 0.20 },
-    "thresholds": { "direct": 0.55, "related": 0.35, "tangential": 0.20 }
+    "schema_version": "2.0",
+    "source_standard": { "name": "AIUC-1", "version": "1.0", "controls": 51 },
+    "target_standard": { "name": "OWASP Top 10 for Agentic Applications", "version": "2026" },
+    "pipeline": { "signals": { ... }, "thresholds": { ... } },
+    "classification": { "rationale_taxonomy": { ... }, "classification_accuracy": { ... } }
+  },
+  "summary": {
+    "controls_mapped": "43 / 51",
+    "total_mappings": 73,
+    "primary_mappings": 51,
+    "secondary_mappings": 22,
+    "rationale_distribution": { "SCOPE": 19, "PREV": 16, ... }
   },
   "control_level": {
-    "aiuc_to_owasp": [
+    "source_to_owasp": [
       {
-        "aiuc_id": "D004",
-        "aiuc_title": "Third-party testing of tool calls",
-        "aiuc_domain": "Reliability",
+        "control_id": "D004",
+        "control_title": "Third-party testing of tool calls",
+        "domain": "Reliability",
+        "function_class": "VALID",
         "mappings": [
           {
             "owasp_id": "ASI02",
-            "owasp_title": "Tool Misuse and Exploitation",
-            "score": 0.779,
-            "confidence": "Direct",
-            "signals": { "reference_bridge": 1.0, "semantic": 0.595, "keyword": 0.116 },
-            "relationship_type": "Addresses"
+            "relevance": "Primary",
+            "rationale_code": "VALID",
+            "rationale_label": "Validate and test",
+            "score": 1.0,
+            "signals": { "reference_bridge": 1.0, "semantic": 0.672, "keyword": 0.142 }
           }
         ]
       }
     ],
-    "owasp_to_aiuc": [ ... ]
+    "owasp_to_source": [ ... ]
   },
-  "sub_activity_level": {
-    "aiuc_to_owasp": [ ... ],
-    "owasp_to_aiuc": [ ... ]
+  "gap_analysis": {
+    "unmapped_controls": [ ... ],
+    "unmapped_count": 8
   }
 }
 ```
@@ -424,7 +529,7 @@ pytest
 
 | Component | Technology |
 |-----------|-----------|
-| Data models | Pydantic 2.0+ |
+| Data models | Pydantic 2.0+ (v1 + v2 crosswalk schema) |
 | Embeddings | sentence-transformers (all-MiniLM-L6-v2) |
 | Keyword similarity | scikit-learn TF-IDF |
 | Excel output | openpyxl |

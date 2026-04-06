@@ -15,6 +15,17 @@ import re
 from typing import Literal
 
 Rationale = Literal["PREV", "SCOPE", "GATE", "DETECT", "VALID", "GOVERN", "ISOLATE", "DISCLOSE"]
+
+RATIONALE_LABELS: dict[str, str] = {
+    "PREV": "Prevent",
+    "SCOPE": "Constrain scope",
+    "GATE": "Human gate",
+    "DETECT": "Detect and trace",
+    "VALID": "Validate and test",
+    "GOVERN": "Policy and governance",
+    "ISOLATE": "Isolate and contain",
+    "DISCLOSE": "Disclose and calibrate",
+}
 Relevance = Literal["Primary", "Secondary"]
 DetectRule = Literal["all", "generic_only", "specific_only", "never"]
 
