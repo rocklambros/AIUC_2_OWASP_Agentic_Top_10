@@ -1,9 +1,10 @@
 """Signal computation for AIUC-1 ↔ OWASP Agentic Top 10 mapping.
 
-Three complementary signals:
-  1. Reference Bridge  (weight 0.45) — Jaccard overlap on shared OWASP LLM Top 10 refs
-  2. Semantic Similarity (weight 0.35) — Sentence-transformer cosine similarity
-  3. TF-IDF Keyword     (weight 0.20) — TF-IDF cosine with synonym expansion
+Four complementary signals:
+  1. Reference Bridge   (weight 0.35) — Jaccard overlap on shared OWASP LLM Top 10 refs
+  2. Semantic Similarity (weight 0.25) — Sentence-transformer cosine similarity
+  3. TF-IDF Keyword      (weight 0.15) — TF-IDF cosine with synonym expansion
+  4. Function Match      (weight 0.25) — Binary match: control function class ∈ threat profile
 """
 
 from __future__ import annotations
@@ -15,6 +16,8 @@ import numpy as np
 from numpy.typing import NDArray
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity as sklearn_cosine
+
+from aiuc.taxonomy import AIUC_CONTROL_FUNCTIONS, THREAT_FUNCTION_PROFILES
 
 if TYPE_CHECKING:
     from sentence_transformers import SentenceTransformer
@@ -208,33 +211,70 @@ def compute_keyword_similarity(
     return similarity.astype(np.float64)
 
 
+# ── Signal 4: Function Match ───────────────────────────────────────────────
+
+
+def compute_function_match(
+    aiuc_controls: list[Control],
+    owasp_entries: list[OWASPEntry],
+) -> NDArray[np.float64]:
+    """Binary match: control's function class ∈ threat's function profile.
+
+    Returns matrix of shape (len(aiuc_controls), len(owasp_entries))
+    with values 0.0 or 1.0.
+    """
+    n_aiuc = len(aiuc_controls)
+    n_owasp = len(owasp_entries)
+    matrix = np.zeros((n_aiuc, n_owasp), dtype=np.float64)
+
+    for i, ctrl in enumerate(aiuc_controls):
+        func = AIUC_CONTROL_FUNCTIONS.get(ctrl.id)
+        if func is None:
+            continue
+        for j, entry in enumerate(owasp_entries):
+            profile = THREAT_FUNCTION_PROFILES.get(entry.identifier, set())
+            if func in profile:
+                matrix[i, j] = 1.0
+
+    return matrix
+
+
 # ── Composite Score ──────────────────────────────────────────────────────────
 
 
 def compute_composite_scores(
     aiuc_controls: list[Control],
     owasp_entries: list[OWASPEntry],
-    weights: tuple[float, float, float] = (0.45, 0.35, 0.20),
+    weights: tuple[float, float, float, float] = (0.35, 0.25, 0.15, 0.25),
     model_name: str = "all-MiniLM-L6-v2",
-) -> tuple[NDArray[np.float64], NDArray[np.float64], NDArray[np.float64], NDArray[np.float64]]:
-    """Compute all three signals and the weighted composite.
+) -> tuple[
+    NDArray[np.float64],
+    NDArray[np.float64],
+    NDArray[np.float64],
+    NDArray[np.float64],
+    NDArray[np.float64],
+]:
+    """Compute all four signals and the weighted composite.
 
     Args:
         aiuc_controls: List of AIUC-1 controls.
         owasp_entries: List of OWASP Agentic Top 10 entries.
-        weights: Tuple of (reference_bridge, semantic, keyword) weights.
+        weights: Tuple of (reference_bridge, semantic, keyword, function_match) weights.
         model_name: Sentence transformer model name.
 
     Returns:
-        Tuple of (composite, reference_bridge, semantic, keyword) matrices.
+        Tuple of (composite, reference_bridge, semantic, keyword, function_match) matrices.
         Each has shape (len(aiuc_controls), len(owasp_entries)).
     """
-    w_ref, w_sem, w_kw = weights
+    w_ref, w_sem, w_kw, w_func = weights
 
     ref_bridge = compute_reference_bridge(aiuc_controls, owasp_entries)
     semantic = compute_semantic_similarity(aiuc_controls, owasp_entries, model_name)
     keyword = compute_keyword_similarity(aiuc_controls, owasp_entries)
+    func_match = compute_function_match(aiuc_controls, owasp_entries)
 
-    composite = w_ref * ref_bridge + w_sem * semantic + w_kw * keyword
+    composite = (
+        w_ref * ref_bridge + w_sem * semantic + w_kw * keyword + w_func * func_match
+    )
 
-    return composite, ref_bridge, semantic, keyword
+    return composite, ref_bridge, semantic, keyword, func_match

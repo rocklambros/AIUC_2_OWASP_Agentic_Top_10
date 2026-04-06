@@ -128,8 +128,8 @@ def run_mapping(
         len(controls), len(entries),
     )
 
-    weight_tuple = (w.reference_bridge, w.semantic, w.keyword)
-    composite, ref_bridge, semantic, keyword = compute_composite_scores(
+    weight_tuple = (w.reference_bridge, w.semantic, w.keyword, w.function_match)
+    composite, ref_bridge, semantic, keyword, func_match = compute_composite_scores(
         controls, entries, weights=weight_tuple, model_name=model_name,
     )
 

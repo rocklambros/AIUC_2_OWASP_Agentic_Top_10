@@ -199,9 +199,10 @@ class OWASPToAIUCSubActivity(BaseModel):
 
 
 class MappingWeights(BaseModel):
-    reference_bridge: float = 0.45
-    semantic: float = 0.35
-    keyword: float = 0.20
+    reference_bridge: float = 0.35
+    semantic: float = 0.25
+    keyword: float = 0.15
+    function_match: float = 0.25
 
 
 class MappingThresholds(BaseModel):
