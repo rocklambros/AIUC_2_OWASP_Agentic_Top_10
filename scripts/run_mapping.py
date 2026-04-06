@@ -51,15 +51,19 @@ def main() -> None:
         help="Sentence transformer model (default: all-MiniLM-L6-v2)",
     )
 
-    # Weight tuning
-    parser.add_argument("--w-ref", type=float, default=0.35, help="Reference bridge weight")
-    parser.add_argument("--w-sem", type=float, default=0.25, help="Semantic similarity weight")
-    parser.add_argument("--w-kw", type=float, default=0.15, help="Keyword overlap weight")
-    parser.add_argument("--w-func", type=float, default=0.25, help="Function match weight")
+    # Weight tuning (content weights should sum to 1.0)
+    parser.add_argument("--w-ref", type=float, default=0.467, help="Reference bridge weight")
+    parser.add_argument("--w-sem", type=float, default=0.333, help="Semantic similarity weight")
+    parser.add_argument("--w-kw", type=float, default=0.200, help="Keyword overlap weight")
+    parser.add_argument("--w-boost", type=float, default=0.5, help="Function match boost factor")
 
     # Threshold tuning
     parser.add_argument("--t-direct", type=float, default=0.55, help="Direct threshold")
-    parser.add_argument("--t-related", type=float, default=0.28, help="Related threshold")
+    parser.add_argument("--t-related", type=float, default=0.35, help="Related threshold (Primary)")
+    parser.add_argument(
+        "--t-sec-related", type=float, default=0.50,
+        help="Related threshold (Secondary)",
+    )
     parser.add_argument("--t-tangential", type=float, default=0.20, help="Tangential threshold")
     parser.add_argument("--t-gov-floor", type=float, default=0.22, help="Governance floor")
 
@@ -92,11 +96,12 @@ def main() -> None:
         reference_bridge=args.w_ref,
         semantic=args.w_sem,
         keyword=args.w_kw,
-        function_match=args.w_func,
+        function_boost=args.w_boost,
     )
     thresholds = MappingThresholds(
         direct=args.t_direct,
         related=args.t_related,
+        secondary_related=args.t_sec_related,
         tangential=args.t_tangential,
         governance_floor=args.t_gov_floor,
     )
@@ -104,7 +109,7 @@ def main() -> None:
     w = weights
     print(
         f"\nWeights: ref={w.reference_bridge}, sem={w.semantic}, "
-        f"kw={w.keyword}, func={w.function_match}",
+        f"kw={w.keyword}, boost={w.function_boost}",
     )
     t = thresholds
     print(

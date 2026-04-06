@@ -1,10 +1,10 @@
 """Signal computation for AIUC-1 ↔ OWASP Agentic Top 10 mapping.
 
-Four complementary signals:
-  1. Reference Bridge   (weight 0.35) — Jaccard overlap on shared OWASP LLM Top 10 refs
-  2. Semantic Similarity (weight 0.25) — Sentence-transformer cosine similarity
-  3. TF-IDF Keyword      (weight 0.15) — TF-IDF cosine with synonym expansion
-  4. Function Match      (weight 0.25) — Binary match: control function class ∈ threat profile
+Three content signals with multiplicative function-match boost:
+  1. Reference Bridge   (weight 0.467) — Jaccard overlap on shared OWASP LLM Top 10 refs
+  2. Semantic Similarity (weight 0.333) — Sentence-transformer cosine similarity
+  3. TF-IDF Keyword      (weight 0.200) — TF-IDF cosine with synonym expansion
+  4. Function Match      (boost  0.5  ) — Multiplicative uplift when function class matches
 """
 
 from __future__ import annotations
@@ -263,7 +263,8 @@ def compute_function_match(
 def compute_composite_scores(
     aiuc_controls: list[Control],
     owasp_entries: list[OWASPEntry],
-    weights: tuple[float, float, float, float] = (0.35, 0.25, 0.15, 0.25),
+    weights: tuple[float, float, float] = (0.467, 0.333, 0.200),
+    function_boost: float = 0.5,
     model_name: str = "all-MiniLM-L6-v2",
 ) -> tuple[
     NDArray[np.float64],
@@ -274,25 +275,35 @@ def compute_composite_scores(
 ]:
     """Compute all four signals and the weighted composite.
 
+    Function match is applied as a multiplicative boost on the content
+    score rather than an additive 4th signal.  This ensures that
+    function-class relevance amplifies genuine content matches but
+    cannot create a mapping on its own.
+
     Args:
         aiuc_controls: List of AIUC-1 controls.
         owasp_entries: List of OWASP Agentic Top 10 entries.
-        weights: Tuple of (reference_bridge, semantic, keyword, function_match) weights.
+        weights: Tuple of (reference_bridge, semantic, keyword) weights.
+            Should sum to 1.0 so the content score is in [0, 1].
+        function_boost: Multiplicative uplift when function class matches
+            the threat profile.  0.5 means a 50 % confidence boost.
         model_name: Sentence transformer model name.
 
     Returns:
-        Tuple of (composite, reference_bridge, semantic, keyword, function_match) matrices.
-        Each has shape (len(aiuc_controls), len(owasp_entries)).
+        Tuple of (composite, reference_bridge, semantic, keyword,
+        function_match) matrices, each of shape
+        (len(aiuc_controls), len(owasp_entries)).
     """
-    w_ref, w_sem, w_kw, w_func = weights
+    w_ref, w_sem, w_kw = weights
 
     ref_bridge = compute_reference_bridge(aiuc_controls, owasp_entries)
     semantic = compute_semantic_similarity(aiuc_controls, owasp_entries, model_name)
     keyword = compute_keyword_similarity(aiuc_controls, owasp_entries)
     func_match = compute_function_match(aiuc_controls, owasp_entries)
 
-    composite = (
-        w_ref * ref_bridge + w_sem * semantic + w_kw * keyword + w_func * func_match
+    content = w_ref * ref_bridge + w_sem * semantic + w_kw * keyword
+    composite = np.minimum(
+        content * (1.0 + function_boost * func_match), 1.0,
     )
 
     return composite, ref_bridge, semantic, keyword, func_match

@@ -792,9 +792,11 @@ def _build_v2_output(mapping: MappingOutput) -> CrosswalkOutput:
                     technique="TF-IDF cosine similarity with domain-specific synonym expansion",
                 ),
                 "function_match": PipelineSignal(
-                    weight=w.function_match,
+                    weight=w.function_boost,
                     technique=(
-                        "Binary match: control function class in threat function profile"
+                        "Multiplicative boost (not additive): "
+                        "content * (1 + boost) when control function "
+                        "class is in threat function profile"
                     ),
                 ),
             },

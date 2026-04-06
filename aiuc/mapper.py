@@ -63,8 +63,8 @@ ANCHOR_PAIRS: list[dict[str, str]] = [
     {"aiuc": "C006", "owasp": "ASI05", "expected": "Direct"},
     # B005(PREV) + func_match boost → Direct with 4-signal scoring
     {"aiuc": "B005", "owasp": "ASI01", "expected": "Direct"},
-    # B002(LLM01,08,10) ↔ ASI06(LLM01,04,08) = Jaccard 2/4
-    {"aiuc": "B002", "owasp": "ASI06", "expected": "Related"},
+    # B002(PREV) + strong ref overlap → Direct with multiplicative boost
+    {"aiuc": "B002", "owasp": "ASI06", "expected": "Direct"},
     # D003(LLM06,08,10) ↔ ASI10(LLM01,02,06,09) = Jaccard 1/6
     {"aiuc": "D003", "owasp": "ASI10", "expected": "Related"},
     # A005(LLM02,05,08) ↔ ASI03(LLM01,02,06) = Jaccard 1/5
@@ -112,7 +112,7 @@ def run_mapping(
     Args:
         aiuc: Parsed AIUC-1 standard.
         owasp: Parsed OWASP Agentic Top 10.
-        weights: Signal weights (default: 0.35/0.25/0.15/0.25).
+        weights: Content signal weights + multiplicative function boost.
         thresholds: Confidence tier thresholds.
         model_name: Sentence transformer model for semantic similarity.
 
@@ -131,9 +131,12 @@ def run_mapping(
         len(controls), len(entries),
     )
 
-    weight_tuple = (w.reference_bridge, w.semantic, w.keyword, w.function_match)
+    weight_tuple = (w.reference_bridge, w.semantic, w.keyword)
     composite, ref_bridge, semantic, keyword, func_match = compute_composite_scores(
-        controls, entries, weights=weight_tuple, model_name=model_name,
+        controls, entries,
+        weights=weight_tuple,
+        function_boost=w.function_boost,
+        model_name=model_name,
     )
 
     # ── Control-level mappings ───────────────────────────────────────────
@@ -170,20 +173,45 @@ def run_mapping(
     )
 
 
-def _apply_governance_floor(
+def _should_include(
     score: float,
-    confidence: ConfidenceTier,
     ctrl_id: str,
+    relevance: str,
     func_match_val: float,
     thresholds: MappingThresholds,
-) -> ConfidenceTier:
-    """Promote GOVERN/DISCLOSE controls with func_match=1.0 above governance floor."""
-    if confidence not in (ConfidenceTier.NONE, ConfidenceTier.TANGENTIAL):
-        return confidence
-    func_class = AIUC_CONTROL_FUNCTIONS.get(ctrl_id)
-    if func_class in ("GOVERN", "DISCLOSE") and func_match_val == 1.0:
-        if score >= thresholds.governance_floor:
-            return ConfidenceTier.RELATED
+) -> ConfidenceTier | None:
+    """Determine if a pair clears the relevance-aware threshold.
+
+    Primary mappings use the standard Related threshold.
+    Secondary mappings use the higher secondary_related threshold.
+    GOVERN/DISCLOSE Primary controls with func_match get the governance floor.
+
+    Returns the confidence tier if included, or None to skip.
+    """
+    confidence = classify_confidence(score, thresholds)
+
+    # Primary: use standard Related threshold (already in confidence)
+    # Secondary: use higher threshold
+    if relevance == "Secondary":
+        if score < thresholds.secondary_related:
+            if score >= thresholds.tangential:
+                confidence = ConfidenceTier.TANGENTIAL
+            else:
+                confidence = ConfidenceTier.NONE
+
+    # Governance floor: only for Primary GOVERN/DISCLOSE with func_match
+    if confidence in (ConfidenceTier.NONE, ConfidenceTier.TANGENTIAL):
+        func_class = AIUC_CONTROL_FUNCTIONS.get(ctrl_id)
+        if (
+            func_class in ("GOVERN", "DISCLOSE")
+            and func_match_val == 1.0
+            and relevance == "Primary"
+            and score >= thresholds.governance_floor
+        ):
+            confidence = ConfidenceTier.RELATED
+
+    if confidence in (ConfidenceTier.NONE, ConfidenceTier.TANGENTIAL):
+        return None
     return confidence
 
 
@@ -206,12 +234,13 @@ def _build_aiuc_to_owasp_control(
 
         for j, entry in enumerate(entries):
             score = float(composite[i, j])
-            confidence = classify_confidence(score, thresholds)
-            confidence = _apply_governance_floor(
-                score, confidence, ctrl.id, float(func_match[i, j]), thresholds,
-            )
+            func, rel = classify_aiuc(ctrl.id, entry.identifier)
 
-            if confidence in (ConfidenceTier.NONE, ConfidenceTier.TANGENTIAL):
+            confidence = _should_include(
+                score, ctrl.id, rel,
+                float(func_match[i, j]), thresholds,
+            )
+            if confidence is None:
                 continue
 
             signals = SignalScores(
@@ -220,7 +249,6 @@ def _build_aiuc_to_owasp_control(
                 keyword=round(float(keyword[i, j]), 3),
             )
 
-            func, rel = classify_aiuc(ctrl.id, entry.identifier)
             mappings.append(ControlMapping(
                 owasp_id=entry.identifier,
                 owasp_title=entry.title,
@@ -264,12 +292,13 @@ def _build_owasp_to_aiuc_control(
 
         for i, ctrl in enumerate(controls):
             score = float(composite[i, j])
-            confidence = classify_confidence(score, thresholds)
-            confidence = _apply_governance_floor(
-                score, confidence, ctrl.id, float(func_match[i, j]), thresholds,
-            )
+            func, rel = classify_aiuc(ctrl.id, entry.identifier)
 
-            if confidence in (ConfidenceTier.NONE, ConfidenceTier.TANGENTIAL):
+            confidence = _should_include(
+                score, ctrl.id, rel,
+                float(func_match[i, j]), thresholds,
+            )
+            if confidence is None:
                 continue
 
             signals = SignalScores(
@@ -278,7 +307,6 @@ def _build_owasp_to_aiuc_control(
                 keyword=round(float(keyword[i, j]), 3),
             )
 
-            func, rel = classify_aiuc(ctrl.id, entry.identifier)
             mappings.append(OWASPControlMapping(
                 aiuc_id=ctrl.id,
                 aiuc_title=ctrl.title,
