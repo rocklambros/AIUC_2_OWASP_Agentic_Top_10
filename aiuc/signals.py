@@ -132,6 +132,13 @@ def _build_owasp_text(entry: OWASPEntry) -> str:
     return " ".join(p for p in parts if p)
 
 
+def _build_prevention_text(entry: OWASPEntry) -> str:
+    """Build text from prevention guidelines only, falling back to full text."""
+    if entry.prevention_guidelines:
+        return " ".join(entry.prevention_guidelines)
+    return _build_owasp_text(entry)
+
+
 def compute_semantic_similarity(
     aiuc_controls: list[Control],
     owasp_entries: list[OWASPEntry],
@@ -140,8 +147,11 @@ def compute_semantic_similarity(
     """Compute cosine similarity using sentence-transformer embeddings.
 
     Returns matrix of shape (len(aiuc_controls), len(owasp_entries)).
-    Z-score normalized within each AIUC control row to discriminate
-    beyond the high baseline similarity that all AI-security texts share.
+
+    Computes similarity against both the full OWASP text and prevention
+    guidelines separately, takes the element-wise max, then Z-score
+    normalizes within each AIUC control row to discriminate beyond the
+    high baseline similarity that all AI-security texts share.
     """
     from sentence_transformers import SentenceTransformer
 
@@ -149,17 +159,25 @@ def compute_semantic_similarity(
 
     aiuc_texts = [_build_document_text(c) for c in aiuc_controls]
     owasp_texts = [_build_owasp_text(e) for e in owasp_entries]
+    prevention_texts = [_build_prevention_text(e) for e in owasp_entries]
 
     aiuc_embeddings = model.encode(aiuc_texts, show_progress_bar=False)
     owasp_embeddings = model.encode(owasp_texts, show_progress_bar=False)
+    prevention_embeddings = model.encode(prevention_texts, show_progress_bar=False)
 
     raw_sim: NDArray[np.float64] = sklearn_cosine(aiuc_embeddings, owasp_embeddings)
+    prevention_sim: NDArray[np.float64] = sklearn_cosine(
+        aiuc_embeddings, prevention_embeddings,
+    )
+
+    # Element-wise max before normalization
+    combined = np.maximum(raw_sim, prevention_sim)
 
     # Z-score normalize per row (per AIUC control)
-    row_means = raw_sim.mean(axis=1, keepdims=True)
-    row_stds = raw_sim.std(axis=1, keepdims=True)
+    row_means = combined.mean(axis=1, keepdims=True)
+    row_stds = combined.std(axis=1, keepdims=True)
     row_stds = np.where(row_stds < 1e-8, 1.0, row_stds)
-    z_scores = (raw_sim - row_means) / row_stds
+    z_scores = (combined - row_means) / row_stds
 
     # Scale z-scores to [0, 1] range using sigmoid-like transform
     normalized = 1.0 / (1.0 + np.exp(-z_scores))
