@@ -50,14 +50,16 @@ def main() -> None:
     )
 
     # Weight tuning
-    parser.add_argument("--w-ref", type=float, default=0.45, help="Reference bridge weight")
-    parser.add_argument("--w-sem", type=float, default=0.35, help="Semantic similarity weight")
-    parser.add_argument("--w-kw", type=float, default=0.20, help="Keyword overlap weight")
+    parser.add_argument("--w-ref", type=float, default=0.35, help="Reference bridge weight")
+    parser.add_argument("--w-sem", type=float, default=0.25, help="Semantic similarity weight")
+    parser.add_argument("--w-kw", type=float, default=0.15, help="Keyword overlap weight")
+    parser.add_argument("--w-func", type=float, default=0.25, help="Function match weight")
 
     # Threshold tuning
     parser.add_argument("--t-direct", type=float, default=0.55, help="Direct threshold")
-    parser.add_argument("--t-related", type=float, default=0.35, help="Related threshold")
+    parser.add_argument("--t-related", type=float, default=0.28, help="Related threshold")
     parser.add_argument("--t-tangential", type=float, default=0.20, help="Tangential threshold")
+    parser.add_argument("--t-gov-floor", type=float, default=0.22, help="Governance floor")
 
     parser.add_argument("-v", "--verbose", action="store_true", help="Verbose logging")
 
@@ -82,17 +84,25 @@ def main() -> None:
         reference_bridge=args.w_ref,
         semantic=args.w_sem,
         keyword=args.w_kw,
+        function_match=args.w_func,
     )
     thresholds = MappingThresholds(
         direct=args.t_direct,
         related=args.t_related,
         tangential=args.t_tangential,
+        governance_floor=args.t_gov_floor,
     )
 
     w = weights
-    print(f"\nWeights: ref={w.reference_bridge}, sem={w.semantic}, kw={w.keyword}")
+    print(
+        f"\nWeights: ref={w.reference_bridge}, sem={w.semantic}, "
+        f"kw={w.keyword}, func={w.function_match}",
+    )
     t = thresholds
-    print(f"Thresholds: direct={t.direct}, related={t.related}, tangential={t.tangential}")
+    print(
+        f"Thresholds: direct={t.direct}, related={t.related}, "
+        f"tangential={t.tangential}, gov_floor={t.governance_floor}",
+    )
     print("\nRunning mapping pipeline...")
 
     mapping = run_mapping(

@@ -14,7 +14,6 @@ import numpy as np
 
 from aiuc.models import (
     AIUC1Standard,
-    RATIONALE_LABELS,
     AIUCToOWASPControl,
     AIUCToOWASPSubActivity,
     ConfidenceTier,
@@ -39,8 +38,12 @@ from aiuc.models import (
     classify_confidence,
     infer_relationship_type,
 )
-from aiuc.taxonomy import classify_aiuc
 from aiuc.signals import compute_composite_scores
+from aiuc.taxonomy import (
+    AIUC_CONTROL_FUNCTIONS,
+    RATIONALE_LABELS,
+    classify_aiuc,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -48,18 +51,18 @@ logger = logging.getLogger(__name__)
 # ── Anchor pairs for calibration ─────────────────────────────────────────────
 
 ANCHOR_PAIRS: list[dict[str, str]] = [
-    # Strong shared LLM refs: D003(LLM06,08,10) ↔ ASI02(LLM06) = Jaccard 1/3
-    {"aiuc": "D003", "owasp": "ASI02", "expected": "Related"},
+    # D003(SCOPE) + func_match boost → Direct with 4-signal scoring
+    {"aiuc": "D003", "owasp": "ASI02", "expected": "Direct"},
     # Perfect ref overlap: D004(LLM06) ↔ ASI02(LLM06)
     {"aiuc": "D004", "owasp": "ASI02", "expected": "Direct"},
     # Perfect ref overlap: E006(LLM03) ↔ ASI04(LLM03)
     {"aiuc": "E006", "owasp": "ASI04", "expected": "Direct"},
     # Shared LLM01: B001(LLM01,04,05,08) ↔ ASI01(LLM01)
     {"aiuc": "B001", "owasp": "ASI01", "expected": "Related"},
-    # C006(LLM05) ↔ ASI05(LLM01,05) = Jaccard 1/2
-    {"aiuc": "C006", "owasp": "ASI05", "expected": "Related"},
-    # B005(LLM01,04,10) ↔ ASI01(LLM01) = Jaccard 1/3
-    {"aiuc": "B005", "owasp": "ASI01", "expected": "Related"},
+    # C006(PREV) + func_match boost → Direct with 4-signal scoring
+    {"aiuc": "C006", "owasp": "ASI05", "expected": "Direct"},
+    # B005(PREV) + func_match boost → Direct with 4-signal scoring
+    {"aiuc": "B005", "owasp": "ASI01", "expected": "Direct"},
     # B002(LLM01,08,10) ↔ ASI06(LLM01,04,08) = Jaccard 2/4
     {"aiuc": "B002", "owasp": "ASI06", "expected": "Related"},
     # D003(LLM06,08,10) ↔ ASI10(LLM01,02,06,09) = Jaccard 1/6
@@ -109,7 +112,7 @@ def run_mapping(
     Args:
         aiuc: Parsed AIUC-1 standard.
         owasp: Parsed OWASP Agentic Top 10.
-        weights: Signal weights (default: 0.45/0.35/0.20).
+        weights: Signal weights (default: 0.35/0.25/0.15/0.25).
         thresholds: Confidence tier thresholds.
         model_name: Sentence transformer model for semantic similarity.
 
@@ -135,10 +138,12 @@ def run_mapping(
 
     # ── Control-level mappings ───────────────────────────────────────────
     aiuc_to_owasp = _build_aiuc_to_owasp_control(
-        controls, entries, composite, ref_bridge, semantic, keyword, domain_map, t,
+        controls, entries, composite, ref_bridge, semantic, keyword,
+        func_match, domain_map, t,
     )
     owasp_to_aiuc = _build_owasp_to_aiuc_control(
-        controls, entries, composite, ref_bridge, semantic, keyword, domain_map, t,
+        controls, entries, composite, ref_bridge, semantic, keyword,
+        func_match, domain_map, t,
     )
 
     # ── Sub-activity-level mappings ──────────────────────────────────────
@@ -165,6 +170,23 @@ def run_mapping(
     )
 
 
+def _apply_governance_floor(
+    score: float,
+    confidence: ConfidenceTier,
+    ctrl_id: str,
+    func_match_val: float,
+    thresholds: MappingThresholds,
+) -> ConfidenceTier:
+    """Promote GOVERN/DISCLOSE controls with func_match=1.0 above governance floor."""
+    if confidence not in (ConfidenceTier.NONE, ConfidenceTier.TANGENTIAL):
+        return confidence
+    func_class = AIUC_CONTROL_FUNCTIONS.get(ctrl_id)
+    if func_class in ("GOVERN", "DISCLOSE") and func_match_val == 1.0:
+        if score >= thresholds.governance_floor:
+            return ConfidenceTier.RELATED
+    return confidence
+
+
 def _build_aiuc_to_owasp_control(
     controls: list[Control],
     entries: list[OWASPEntry],
@@ -172,6 +194,7 @@ def _build_aiuc_to_owasp_control(
     ref_bridge: np.ndarray,
     semantic: np.ndarray,
     keyword: np.ndarray,
+    func_match: np.ndarray,
     domain_map: dict[str, str],
     thresholds: MappingThresholds,
 ) -> list[AIUCToOWASPControl]:
@@ -184,6 +207,9 @@ def _build_aiuc_to_owasp_control(
         for j, entry in enumerate(entries):
             score = float(composite[i, j])
             confidence = classify_confidence(score, thresholds)
+            confidence = _apply_governance_floor(
+                score, confidence, ctrl.id, float(func_match[i, j]), thresholds,
+            )
 
             if confidence in (ConfidenceTier.NONE, ConfidenceTier.TANGENTIAL):
                 continue
@@ -226,6 +252,7 @@ def _build_owasp_to_aiuc_control(
     ref_bridge: np.ndarray,
     semantic: np.ndarray,
     keyword: np.ndarray,
+    func_match: np.ndarray,
     domain_map: dict[str, str],
     thresholds: MappingThresholds,
 ) -> list[OWASPToAIUCControl]:
@@ -238,6 +265,9 @@ def _build_owasp_to_aiuc_control(
         for i, ctrl in enumerate(controls):
             score = float(composite[i, j])
             confidence = classify_confidence(score, thresholds)
+            confidence = _apply_governance_floor(
+                score, confidence, ctrl.id, float(func_match[i, j]), thresholds,
+            )
 
             if confidence in (ConfidenceTier.NONE, ConfidenceTier.TANGENTIAL):
                 continue
@@ -248,17 +278,21 @@ def _build_owasp_to_aiuc_control(
                 keyword=round(float(keyword[i, j]), 3),
             )
 
+            func, rel = classify_aiuc(ctrl.id, entry.identifier)
             mappings.append(OWASPControlMapping(
                 aiuc_id=ctrl.id,
                 aiuc_title=ctrl.title,
                 aiuc_domain=domain_map.get(ctrl.id, ""),
+                rationale_code=RationaleCode(func),
+                rationale_label=RATIONALE_LABELS.get(func, func),
+                relevance=RelevanceLevel(rel),
                 score=round(score, 3),
                 confidence=confidence,
                 signals=signals,
                 relationship_type=infer_relationship_type(signals, ctrl),
             ))
 
-        mappings.sort(key=lambda m: m.score, reverse=True)
+        mappings.sort(key=lambda m: m.score or 0.0, reverse=True)
 
         results.append(OWASPToAIUCControl(
             owasp_id=entry.identifier,

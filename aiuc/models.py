@@ -37,11 +37,11 @@ RATIONALE_LABELS: dict[str, str] = {
     "PREV": "Prevent",
     "SCOPE": "Constrain scope",
     "GATE": "Human gate",
-    "DETECT": "Detect / trace",
-    "VALID": "Test / validate",
-    "GOVERN": "Govern / policy",
-    "ISOLATE": "Isolate / contain",
-    "DISCLOSE": "Disclose / transparency",
+    "DETECT": "Detect and trace",
+    "VALID": "Validate and test",
+    "GOVERN": "Policy and governance",
+    "ISOLATE": "Isolate and contain",
+    "DISCLOSE": "Disclose and calibrate",
 }
 
 
@@ -159,9 +159,12 @@ class OWASPControlMapping(BaseModel):
     aiuc_id: str
     aiuc_title: str
     aiuc_domain: str
-    score: float
-    confidence: ConfidenceTier
-    signals: SignalScores
+    rationale_code: RationaleCode
+    rationale_label: str
+    relevance: RelevanceLevel
+    score: float | None = None
+    confidence: ConfidenceTier = ConfidenceTier.NONE
+    signals: SignalScores | None = None
     relationship_type: RelationshipType = RelationshipType.ADDRESSES
 
 
@@ -207,8 +210,9 @@ class MappingWeights(BaseModel):
 
 class MappingThresholds(BaseModel):
     direct: float = 0.55
-    related: float = 0.35
+    related: float = 0.28
     tangential: float = 0.20
+    governance_floor: float = 0.22
 
 
 class MappingMetadata(BaseModel):

@@ -572,9 +572,9 @@ def _write_owasp_to_aiuc_control(wb: Workbook, mapping: MappingOutput) -> None:
             ws.cell(row=row, column=6, value=m.aiuc_domain)
             ws.cell(row=row, column=7, value=m.score)
             ws.cell(row=row, column=8, value=m.confidence.value)
-            ws.cell(row=row, column=9, value=m.signals.reference_bridge)
-            ws.cell(row=row, column=10, value=m.signals.semantic)
-            ws.cell(row=row, column=11, value=m.signals.keyword)
+            ws.cell(row=row, column=9, value=m.signals.reference_bridge if m.signals else 0.0)
+            ws.cell(row=row, column=10, value=m.signals.semantic if m.signals else 0.0)
+            ws.cell(row=row, column=11, value=m.signals.keyword if m.signals else 0.0)
             ws.cell(row=row, column=12, value=m.relationship_type.value)
             row += 1
 
