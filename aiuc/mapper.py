@@ -14,6 +14,7 @@ import numpy as np
 
 from aiuc.models import (
     AIUC1Standard,
+    RATIONALE_LABELS,
     AIUCToOWASPControl,
     AIUCToOWASPSubActivity,
     ConfidenceTier,
@@ -30,12 +31,15 @@ from aiuc.models import (
     OWASPSubActivityMapping,
     OWASPToAIUCControl,
     OWASPToAIUCSubActivity,
+    RationaleCode,
+    RelevanceLevel,
     SignalScores,
     SubActivityLevelMappings,
     SubActivityMapping,
     classify_confidence,
     infer_relationship_type,
 )
+from aiuc.taxonomy import classify_aiuc
 from aiuc.signals import compute_composite_scores
 
 logger = logging.getLogger(__name__)
@@ -190,16 +194,20 @@ def _build_aiuc_to_owasp_control(
                 keyword=round(float(keyword[i, j]), 3),
             )
 
+            func, rel = classify_aiuc(ctrl.id, entry.identifier)
             mappings.append(ControlMapping(
                 owasp_id=entry.identifier,
                 owasp_title=entry.title,
+                rationale_code=RationaleCode(func),
+                rationale_label=RATIONALE_LABELS.get(func, func),
+                relevance=RelevanceLevel(rel),
                 score=round(score, 3),
                 confidence=confidence,
                 signals=signals,
                 relationship_type=infer_relationship_type(signals, ctrl),
             ))
 
-        mappings.sort(key=lambda m: m.score, reverse=True)
+        mappings.sort(key=lambda m: m.score or 0.0, reverse=True)
 
         results.append(AIUCToOWASPControl(
             aiuc_id=ctrl.id,
