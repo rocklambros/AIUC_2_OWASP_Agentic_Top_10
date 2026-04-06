@@ -40,3 +40,6 @@ htmlcov/
 # Scratch files
 AIUC_2_OWASP_Agentic_Top_10_scratch.txt
 mapping/~$*
+
+# ZERG/GSD tooling state
+.gsd/
